@@ -86,6 +86,9 @@ The data model:
   When `dateVerified` is `false`, the site shows a `?` flag next to the date.
 - `figures[]` — `name`, `role`, `dates`, `country`, `notes`, `sources[]`.
 - `organizations[]` — `name`, `founded`, `relation`, `url`, `notes`, `sources[]`.
+- `map.countries[]` — `code` (ISO-2), `name`, `tier` (`core`/`presence`),
+  `note`, `sources[]`; rendered as the interactive Latin America map
+  (`src/latam.svg`, Natural Earth boundaries shared with the fsp project).
 - `disambiguation.items[]` — `title`, `text`, `sources[]` (contested points, attributed).
 - `references[]` — `id`, `title`, `url`, `publisher`, `type`. Facts cite via
   `sources: ["<id>", …]`; the build renders superscript `[n]` markers.

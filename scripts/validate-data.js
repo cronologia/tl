@@ -121,6 +121,20 @@ if (d.organizations !== undefined) {
   });
 }
 
+// ---- map ------------------------------------------------------------------
+if (d.map !== undefined) {
+  if (!isArr(d.map.countries) || d.map.countries.length === 0) err('map.countries must be a non-empty array');
+  else d.map.countries.forEach((c, i) => {
+    const at = `map.countries[${i}]`;
+    if (!isStr(c.code) || !/^[A-Z]{2}$/.test(c.code)) err(`${at}.code must be a 2-letter ISO code`);
+    if (!isStr(c.name)) err(`${at}.name missing`);
+    if (c.tier !== 'core' && c.tier !== 'presence') err(`${at}.tier must be "core" or "presence"`);
+    if (!isStr(c.note)) err(`${at}.note missing`);
+    checkSources(at, c.sources, true);
+  });
+  if (!isStr(d.map.note)) err('map.note missing');
+}
+
 // ---- disambiguation -------------------------------------------------------
 if (d.disambiguation !== undefined) {
   const items = d.disambiguation.items;
