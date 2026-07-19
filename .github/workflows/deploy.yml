@@ -56,13 +56,13 @@ jobs:
           echo "docs/ is in sync."
 
       - name: Upload Pages artifact
-        if: github.ref_name == github.event.repository.default_branch && vars.ENABLE_PAGES == 'true'
+        if: github.ref == 'refs/heads/master' && vars.ENABLE_PAGES == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
   deploy:
-    if: github.ref_name == github.event.repository.default_branch && vars.ENABLE_PAGES == 'true'
+    if: github.ref == 'refs/heads/master' && vars.ENABLE_PAGES == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:
