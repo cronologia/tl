@@ -119,3 +119,23 @@ ol.references a:hover { text-decoration: underline; }
   .facts { grid-template-columns: 1fr; gap: .1rem; }
   .facts dt { margin-top: .5rem; }
 }
+
+/* Latin America map (reuses the fsp Natural Earth SVG; see scripts/gen-latam-svg.js there) */
+.map-cols { display: grid; grid-template-columns: minmax(260px, 440px) 1fr; gap: 1.25rem; align-items: start; }
+@media (max-width: 760px) { .map-cols { grid-template-columns: 1fr; } }
+.atlas-map { max-width: 440px; }
+.latam-svg { width: 100%; height: auto; display: block; }
+.latam-bg { fill: #e6eaef; stroke: #fff; stroke-width: .5; }
+.latam-c { fill: #dfe3ea; stroke: #fff; stroke-width: .6; transition: fill .12s ease; }
+.latam-c:hover, .latam-c:focus-visible { outline: none; stroke: var(--ink); stroke-width: 1.2; }
+.latam-c.map-core { fill: var(--accent); cursor: pointer; }
+.latam-c.map-presence { fill: #8cc7a1; cursor: pointer; }
+.ptl-caption { color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: .35rem .6rem; font-size: .82rem; margin: .5rem 0; min-height: 1.5em; }
+.ptl-legend { display: flex; flex-wrap: wrap; gap: .35rem 1rem; margin-top: .5rem; font-size: .8rem; color: var(--muted); }
+.ptl-key { display: inline-flex; align-items: center; gap: .35rem; }
+.atlas-swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
+.atlas-swatch.map-core { background: var(--accent); }
+.atlas-swatch.map-presence { background: #8cc7a1; }
+.atlas-swatch.map-none { background: #dfe3ea; }
+.atlas-credit { color: var(--muted); font-size: .72rem; margin: .3rem 0 0; }
+.map-cards .related-card.map-card-presence { border-left-color: #8cc7a1; }

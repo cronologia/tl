@@ -109,6 +109,22 @@
     { "name": "ISAL (Iglesia y Sociedad en América Latina)", "founded": "1961", "place": "Latin America", "relation": "The Protestant 'church and society' network (journal 'Cristianismo y Sociedad') that formed a parallel precursor stream, with bridge figures such as Rubem Alves and Richard Shaull.", "sources": ["teseo-isal"] },
     { "name": "Derived and parallel liberation theologies", "relation": "Black theology (James Cone), feminist and womanist theologies, indigenous 'teología india', Dalit and Minjung theologies, and later ecological developments — related currents that dialogue with, but are distinct from, the Latin American movement.", "sources": ["wikipedia-en"] }
   ],
+  "map": {
+    "note": "Where the movement's story happened. 'Major center' marks countries with foundational events or leading figures documented in this chronology; 'documented presence' marks countries appearing through conferences or individual figures. The map reflects only what this dataset currently cites — not a claim about the movement's full geography.",
+    "countries": [
+      { "code": "PE", "name": "Peru", "tier": "core", "note": "Gutiérrez's home: the 1968 Chimbote lecture and the 1971 foundational book (Lima); decades later, the country where Leo XIV served as bishop.", "sources": ["celats-gutierrez", "wikipedia-gutierrez", "ncr-leo"] },
+      { "code": "BR", "name": "Brazil", "tier": "core", "note": "The movement's largest base: the CEBs, the Boff brothers, Frei Betto, Hélder Câmara, Casaldáliga, Rubem Alves; host of Aparecida 2007.", "sources": ["wikipedia-pt", "wikipedia-boff", "wikipedia-aparecida"] },
+      { "code": "SV", "name": "El Salvador", "tier": "core", "note": "Óscar Romero (assassinated 1980, canonized 2018), the UCA Jesuits — Ellacuría, Sobrino — and the 1989 massacre.", "sources": ["wikipedia-romero", "npr-uca"] },
+      { "code": "NI", "name": "Nicaragua", "tier": "core", "note": "Ernesto Cardenal, Solentiname, and the Sandinista-era confrontation with John Paul II (1983 reprimand, 1984 suspension, 2019 restoration).", "sources": ["wikipedia-cardenal", "vatican-news-cardenal"] },
+      { "code": "CO", "name": "Colombia", "tier": "core", "note": "Medellín 1968 (CELAM II), CELAM's Bogotá headquarters, precursor symbol Camilo Torres — and opponent Cardinal López Trujillo.", "sources": ["wikipedia-medellin", "wikipedia-torres"] },
+      { "code": "CL", "name": "Chile", "tier": "core", "note": "Christians for Socialism (1971–72) and its banning after the 1973 coup.", "sources": ["larr-cfs", "wikipedia-cfs"] },
+      { "code": "UY", "name": "Uruguay", "tier": "presence", "note": "Juan Luis Segundo, author of 'The Liberation of Theology' (1975).", "sources": ["wikipedia-segundo"] },
+      { "code": "MX", "name": "Mexico", "tier": "presence", "note": "Host of Puebla 1979 (CELAM III) and of the First Ecclesial Assembly (2021).", "sources": ["jp2-puebla-address", "celam-adn"] },
+      { "code": "DO", "name": "Dominican Republic", "tier": "presence", "note": "Host of Santo Domingo 1992 (CELAM IV), widely read by commentators as marginalizing liberationist currents.", "sources": ["encyclopedia-santodomingo"] },
+      { "code": "AR", "name": "Argentina", "tier": "presence", "note": "Home of the related but distinct 'teología del pueblo' that formed Jorge Bergoglio — kept apart from liberation theology in this dataset.", "sources": ["springer-francis", "cna-francis-distance"] },
+      { "code": "BO", "name": "Bolivia", "tier": "presence", "note": "Reported site of the 1972 CELAM assembly that elected López Trujillo secretary-general (venue to verify).", "sources": ["wikipedia-en"] }
+    ]
+  },
   "disambiguation": {
     "note": "Liberation Theology is politically contested terrain. The entries below record nuances that are easy to flatten; each characterization is attributed to its source.",
     "items": [

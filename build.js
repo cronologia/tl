@@ -52,6 +52,15 @@ function formatArchiveTs(ts) {
   return `${ts.slice(0, 4)}-${ts.slice(4, 6)}-${ts.slice(6, 8)}`;
 }
 
+/** Load the committed Latin America SVG (Natural Earth, public domain). */
+function loadLatamSvg() {
+  try {
+    return fs.readFileSync(path.join(SRC_DIR, 'latam.svg'), 'utf8');
+  } catch {
+    return '';
+  }
+}
+
 /** Load the machine-generated Wayback snapshot cache (url -> snapshot), if any. */
 function loadArchives() {
   try {
@@ -122,6 +131,67 @@ function renderOrgCard(org, refNumById) {
         ${org.notes ? `<p class="related-meta">${esc(org.notes)}</p>` : ''}
         ${org.url ? `<p class="related-link"><a href="${esc(org.url)}" rel="noopener noreferrer" target="_blank">${esc(org.url)}</a></p>` : ''}
       </div>`;
+}
+
+/**
+ * Render the Latin America map section: the committed Natural Earth SVG with
+ * countries highlighted per data.map.countries[] (tier: "core" | "presence"),
+ * a hover/focus caption, and an accessible card list of the same data.
+ */
+function renderMapSection(map, refNumById) {
+  if (!map || !Array.isArray(map.countries) || map.countries.length === 0) return '';
+  let svg = loadLatamSvg();
+  if (!svg) return '';
+
+  for (const c of map.countries) {
+    const marker = `id="ne-${c.code}" class="latam-c"`;
+    svg = svg.replace(
+      marker,
+      `id="ne-${c.code}" class="latam-c map-${esc(c.tier)}" tabindex="0" data-name="${esc(c.name)}" data-note="${esc(c.note)}"`
+    );
+  }
+
+  const cards = map.countries
+    .map((c) => `      <div class="related-card map-card-${esc(c.tier)}">
+        <h3>${esc(c.name)}</h3>
+        <p>${esc(c.note)}${renderCites(c.sources, refNumById)}</p>
+      </div>`)
+    .join('\n');
+
+  return `    <section id="map">
+      <h2>Map</h2>
+      <p class="section-intro">${esc(map.note)}</p>
+      <div class="map-cols">
+        <div class="atlas-map">
+${svg}
+          <p class="ptl-caption" id="map-caption" aria-live="polite">Hover or focus a country for details.</p>
+          <div class="ptl-legend">
+            <span class="ptl-key"><span class="atlas-swatch map-core"></span> major center of the movement</span>
+            <span class="ptl-key"><span class="atlas-swatch map-presence"></span> documented presence / conference host</span>
+            <span class="ptl-key"><span class="atlas-swatch map-none"></span> not yet documented here</span>
+          </div>
+          <p class="atlas-credit">Boundaries: Natural Earth (public domain).</p>
+        </div>
+        <div class="party-grid map-cards">
+${cards}
+        </div>
+      </div>
+      <script>
+        (function () {
+          var cap = document.getElementById('map-caption');
+          if (!cap) return;
+          var reset = function () { cap.textContent = 'Hover or focus a country for details.'; };
+          document.querySelectorAll('#map .latam-c[data-name]').forEach(function (el) {
+            var show = function () { cap.textContent = el.getAttribute('data-name') + ' — ' + el.getAttribute('data-note'); };
+            el.addEventListener('mouseenter', show);
+            el.addEventListener('focus', show);
+            el.addEventListener('mouseleave', reset);
+            el.addEventListener('blur', reset);
+          });
+        })();
+      </script>
+    </section>
+`;
 }
 
 function renderReference(r, n, archives) {
@@ -196,6 +266,7 @@ ${ANALYTICS}
     <div class="wrap">
       <a href="#about">About</a>
       <a href="#chronology">Chronology</a>
+      ${data.map ? '<a href="#map">Map</a>' : ''}
       <a href="#figures">Key figures</a>
       <a href="#organizations">Organizations</a>
       ${disambigCards ? '<a href="#disambiguation">Disambiguation</a>' : ''}
@@ -228,6 +299,7 @@ ${eventRows}
       </div>
     </section>
 
+${renderMapSection(data.map, refNumById)}
     <section id="figures">
       <h2>Key figures</h2>
       <div class="party-grid">
