@@ -259,6 +259,10 @@ ${ANALYTICS}
       <p class="subtitle">${esc(meta.subtitle)}</p>
       <p class="lead">${esc(meta.description)}</p>
       <p class="updated">Last updated: ${esc(meta.lastUpdated)}</p>
+      <div class="viz-chips">
+        <a href="#map">🗺 Latam map</a>
+        <a href="#chronology">📜 Chronology</a>
+      </div>
     </div>
   </header>
 
