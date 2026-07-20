@@ -1,8 +1,8 @@
 {
   "_meta": {
     "generatedBy": "scripts/archive-refs.js",
-    "lastRun": "2026-07-20T11:59:31.016Z",
-    "count": 93
+    "lastRun": "2026-07-20T14:50:01.038Z",
+    "count": 94
   },
   "snapshots": {
     "https://en.wikipedia.org/wiki/Liberation_theology": {
@@ -172,13 +172,6 @@
       "status": "200",
       "fresh": false,
       "checkedAt": "2026-07-20T11:57:16.037Z"
-    },
-    "https://www.celam.org/doc_conferencias/Documento_Conclusivo_Puebla.pdf": {
-      "archiveUrl": "https://web.archive.org/web/20251127231241/https://celam.org/doc_conferencias/Documento_Conclusivo_Puebla.pdf",
-      "timestamp": "20251127231241",
-      "status": "200",
-      "fresh": false,
-      "checkedAt": "2026-07-20T11:57:17.028Z"
     },
     "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/": {
       "archiveUrl": "https://web.archive.org/web/20260515070220/https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
@@ -655,6 +648,20 @@
       "status": "200",
       "fresh": false,
       "checkedAt": "2026-07-20T11:59:30.265Z"
+    },
+    "https://cja.org/what-we-do/litigation/the-jesuits-massacre-case/": {
+      "archiveUrl": "https://web.archive.org/web/20260315172903/https://cja.org/what-we-do/litigation/the-jesuits-massacre-case/",
+      "timestamp": "20260315172903",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-20T14:49:42.322Z"
+    },
+    "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_20061126_nota-sobrino_en.html": {
+      "archiveUrl": "https://web.archive.org/web/20250805155723/https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_20061126_nota-sobrino_en.html",
+      "timestamp": "20250805155723",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-20T14:49:44.637Z"
     }
   }
 }
