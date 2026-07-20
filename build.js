@@ -115,7 +115,7 @@ function renderEventRow(ev, refNumById) {
 function renderFigureCard(fig, refNumById) {
   const meta = [fig.dates, fig.country].filter(Boolean).map(esc).join(' · ');
   return `      <div class="party-card">
-        <h3>${esc(fig.name)}</h3>
+        <h3><a href="figures/${esc(figureSlug(fig.name))}.html">${esc(fig.name)}</a></h3>
         ${meta ? `<p class="country">${meta}</p>` : ''}
         <p class="figures">${esc(fig.role)}${renderCites(fig.sources, refNumById)}</p>
         ${fig.notes ? `<p class="party-notes">${esc(fig.notes)}</p>` : ''}
@@ -203,6 +203,165 @@ function renderReference(r, n, archives) {
           <a href="${esc(r.url)}" rel="noopener noreferrer" target="_blank">${esc(r.title)}</a>${archived}
           <span class="ref-meta">${esc(r.publisher)} · ${esc(r.type)}</span>
         </li>`;
+}
+
+/** URL-safe slug for a figure name (accent-folded, e.g. "Óscar Romero" -> "oscar-romero"). */
+function figureSlug(name) {
+  return String(name)
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // strip diacritics
+    .replace(/\s*\([^)]*\)\s*/g, ' ')                  // drop parentheticals
+    .replace(/\s*\/\s*/g, '-')                         // "A / B" -> "a-b"
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Build, for each figure, the set of distinct name strings used to find the
+ * chronology events that involve them. Matching is deliberately conservative:
+ * full-name variants always, plus a bare surname ONLY when that surname is
+ * unique across figures (so the two Boffs never cross-match). Tokens shorter
+ * than 4 characters are dropped to avoid noise.
+ */
+function buildFigureMatchers(figures) {
+  const variantsOf = (name) => {
+    const out = new Set();
+    for (const part of String(name).split('/')) {
+      const p = part.trim();
+      if (!p) continue;
+      const paren = p.match(/\(([^)]*)\)/);
+      const base = p.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      if (base.length >= 4) out.add(base);
+      if (paren && paren[1].trim().length >= 4) out.add(paren[1].trim());
+    }
+    return [...out];
+  };
+  const surnameOf = (v) => {
+    const w = v.split(/\s+/).filter((x) => !/^(de|da|do|dos|la|del|von|van)$/i.test(x));
+    const last = w[w.length - 1] || '';
+    return last.length >= 4 ? last : '';
+  };
+  // Count surname occurrences to detect collisions (e.g. "Boff").
+  const surnameCounts = new Map();
+  const perFig = figures.map((f) => {
+    const variants = variantsOf(f.name);
+    const surnames = [...new Set(variants.map(surnameOf).filter(Boolean))];
+    for (const s of surnames) surnameCounts.set(s, (surnameCounts.get(s) || 0) + 1);
+    return { fig: f, variants, surnames };
+  });
+  return perFig.map(({ fig, variants, surnames }) => {
+    const tokens = new Set(variants);
+    for (const s of surnames) if (surnameCounts.get(s) === 1) tokens.add(s);
+    return { fig, tokens: [...tokens] };
+  });
+}
+
+/** Whole-word, accent-aware test that `haystack` contains `token`. */
+function mentions(haystack, token) {
+  const t = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^\\p{L}])${t}([^\\p{L}]|$)`, 'u').test(haystack);
+}
+
+/** Events (in chronological order) that mention a figure, by its match tokens. */
+function relatedEvents(events, tokens) {
+  return [...events]
+    .sort((a, b) => a.year - b.year || String(a.date || '').localeCompare(String(b.date || '')))
+    .filter((ev) => {
+      const hay = `${ev.title} ${ev.text || ''}`;
+      return tokens.some((tok) => mentions(hay, tok));
+    });
+}
+
+/**
+ * Render a standalone per-figure page (docs/figures/<slug>.html): the figure's
+ * bio, a self-contained references list (its own cited sources plus those of the
+ * related events), and the chronology events that involve them, each linking
+ * back to the main chronology. Citations are numbered locally to this page.
+ */
+function renderFigurePage(fig, events, tokens, archives, meta, references) {
+  const related = relatedEvents(events, tokens);
+
+  // Local reference numbering: figure sources first, then related-event sources.
+  const byId = new Map((references || []).map((r) => [r.id, r]));
+  const localIds = [];
+  const push = (sources) => {
+    for (const s of sources || []) if (!localIds.includes(s)) localIds.push(s);
+  };
+  push(fig.sources);
+  related.forEach((ev) => push(ev.sources));
+  const localRefById = new Map();
+  const localRefs = [];
+  for (const id of localIds) {
+    const ref = byId.get(id);
+    if (ref) { localRefs.push(ref); localRefById.set(id, localRefs.length); }
+  }
+
+  const metaLine = [fig.dates, fig.country].filter(Boolean).map(esc).join(' · ');
+  const eventRows = related.map((ev) => {
+    const flag = ev.dateVerified === false ? ' <span class="flag" title="Date not yet verified against a primary source">?</span>' : '';
+    const text = ev.text ? ` <span class="muted">— ${esc(ev.text)}</span>` : '';
+    return `        <tr>
+          <td class="year">${esc(ev.year)}</td>
+          <td>${esc(ev.date || '')}${flag}</td>
+          <td><strong>${esc(ev.title)}</strong>${text}${renderCites(ev.sources, localRefById)}</td>
+        </tr>`;
+  }).join('\n');
+
+  const refList = localRefs.map((r, i) => renderReference(r, i + 1, archives)).join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="${esc(meta.language || 'en')}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${esc(fig.name)} — ${esc(meta.title)}</title>
+  <meta name="description" content="${esc(fig.name)}: ${esc(fig.role)}">
+${ANALYTICS}
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <p class="updated"><a href="../index.html">← ${esc(meta.title)}</a></p>
+      <h1>${esc(fig.name)}</h1>
+      ${metaLine ? `<p class="subtitle">${metaLine}</p>` : ''}
+      <p class="lead">${esc(fig.role)}${renderCites(fig.sources, localRefById)}</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="related">
+      <h2>In the chronology</h2>
+      ${related.length
+        ? `<p class="section-intro">${related.length} event${related.length === 1 ? '' : 's'} in the <a href="../index.html#chronology">chronology</a> involve this figure.</p>
+      <div class="table-scroll">
+      <table class="meetings">
+        <thead><tr><th>Year</th><th>Date</th><th>Event</th></tr></thead>
+        <tbody>
+${eventRows}
+        </tbody>
+      </table>
+      </div>`
+        : `<p class="section-intro">No dated chronology events reference this figure yet; see the <a href="../index.html#chronology">chronology</a>.</p>`}
+    </section>
+
+    ${localRefs.length ? `<section id="references">
+      <h2>References</h2>
+      <ol class="references">
+${refList}
+      </ol>
+    </section>` : ''}
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Compiled static site generated from <code>data/chronology.json</code> by <code>build.js</code>.
+      Part of the Cronologia project family. <a href="../index.html">Back to the chronology</a>.</p>
+    </div>
+  </footer>
+</body>
+</html>
+`;
 }
 
 function renderPage(data, archives) {
@@ -357,9 +516,20 @@ function main() {
   // Disable Jekyll processing on GitHub Pages.
   fs.writeFileSync(path.join(OUT_DIR, '.nojekyll'), '');
 
+  // Per-figure pages (docs/figures/<slug>.html).
+  const figuresDir = path.join(OUT_DIR, 'figures');
+  fs.mkdirSync(figuresDir, { recursive: true });
+  const matchers = buildFigureMatchers(data.figures);
+  for (const { fig, tokens } of matchers) {
+    fs.writeFileSync(
+      path.join(figuresDir, `${figureSlug(fig.name)}.html`),
+      renderFigurePage(fig, data.events, tokens, archives, data.meta, data.references)
+    );
+  }
+
   const archivedRefs = data.references.filter((r) => archives[r.url] && archives[r.url].archiveUrl).length;
   console.log(
-    `Built docs/index.html (${data.events.length} events, ${data.figures.length} figures, ` +
+    `Built docs/index.html + ${data.figures.length} figure pages (${data.events.length} events, ` +
     `${data.references.length} references, ${archivedRefs} with archive fallback).`
   );
 }
@@ -368,4 +538,7 @@ function main() {
 // the pure helpers so they can be unit-tested without generating docs/.
 if (require.main === module) main();
 
-module.exports = { esc, formatArchiveTs, renderCites, decadeOf, renderPage };
+module.exports = {
+  esc, formatArchiveTs, renderCites, decadeOf, renderPage,
+  figureSlug, buildFigureMatchers, relatedEvents, renderFigurePage,
+};
