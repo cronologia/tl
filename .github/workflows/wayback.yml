@@ -1,0 +1,84 @@
+name: Wayback archiving
+
+# Preserves every reference URL in the Internet Archive and refreshes the
+# snapshot cache (data/archives.json) that build.js renders as "archived"
+# fallback links. Runs on GitHub's runners because they can reach archive.org,
+# whereas some environments block it by egress policy (ported from fsp ADR-0006).
+#
+# - pull_request (script/workflow changes): proves the archiver runs, using a
+#   fast --lookup-only pass; does not commit.
+# - workflow_dispatch / schedule: full Save Page Now capture; commits the
+#   refreshed cache + regenerated docs/ back to the default branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      save_all:
+        description: 'Re-capture every URL even if a snapshot already exists'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '23 4 * * 1' # weekly, Mondays 04:23 UTC
+  pull_request:
+    paths:
+      - 'scripts/archive-refs.js'
+      - '.github/workflows/wayback.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wayback-archiving
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Archive reference URLs
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            node scripts/archive-refs.js --lookup-only || echo "::warning::archive step failed (archive.org unreachable?)"
+          else
+            node scripts/archive-refs.js ${{ (github.event_name == 'workflow_dispatch' && inputs.save_all) && '--save-all' || '' }} || echo "::warning::archive step failed (archive.org unreachable or some saves failed)"
+          fi
+
+      - name: Rebuild site
+        run: node build.js
+
+      - name: Job summary
+        run: |
+          echo "## Wayback archiving" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f data/archives.json ]; then
+            node -e "const d=require('./data/archives.json'); const n=Object.keys(d.snapshots||{}).length; console.log('- Cached snapshots: **'+n+'**'); console.log('- Last run: '+((d._meta&&d._meta.lastRun)||'n/a'));" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- No cache produced (archive.org may be unreachable from this runner)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit results
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/archives.json docs/ || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: refresh Wayback snapshot cache [skip ci]"
+            # main may have advanced while this run worked; rebase and retry so
+            # the generated-data commit isn't lost to a non-fast-forward rejection.
+            n=0
+            until git push; do
+              n=$((n+1))
+              if [ "$n" -ge 4 ]; then echo "::error::push failed after $n attempts"; exit 1; fi
+              echo "::warning::push rejected (main advanced) — rebasing on origin/main and retrying ($n)"
+              git fetch origin main
+              git rebase origin/main || { echo "::error::rebase conflict on generated data"; git rebase --abort; exit 1; }
+            done
+          fi
