@@ -1,8 +1,8 @@
 {
   "_meta": {
     "generatedBy": "scripts/archive-refs.js",
-    "lastRun": "2026-07-20T14:50:01.038Z",
-    "count": 94
+    "lastRun": "2026-07-27T08:19:36.793Z",
+    "count": 99
   },
   "snapshots": {
     "https://en.wikipedia.org/wiki/Liberation_theology": {
@@ -662,6 +662,41 @@
       "status": "200",
       "fresh": false,
       "checkedAt": "2026-07-20T14:49:44.637Z"
+    },
+    "https://orbisbooks.com/products/9781626985414": {
+      "archiveUrl": "https://web.archive.org/web/20260408171919/https://orbisbooks.com/products/9781626985414",
+      "timestamp": "20260408171919",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-27T08:14:52.254Z"
+    },
+    "https://neamp.pucsp.br/liderancas/carlos-alberto-libanio-christo": {
+      "archiveUrl": "https://web.archive.org/web/20260606113316/https://neamp.pucsp.br/liderancas/carlos-alberto-libanio-christo",
+      "timestamp": "20260606113316",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-27T08:17:04.555Z"
+    },
+    "https://www.brasildefato.com.br/2019/08/26/canonizacao-de-dom-helder-camara-patrono-dos-direitos-humanos-avanca-no-vaticano/": {
+      "archiveUrl": "https://web.archive.org/web/20250521121026/https://www.brasildefato.com.br/2019/08/26/canonizacao-de-dom-helder-camara-patrono-dos-direitos-humanos-avanca-no-vaticano/",
+      "timestamp": "20250521121026",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-27T08:18:32.636Z"
+    },
+    "https://pt.wikipedia.org/wiki/Comiss%C3%A3o_Pastoral_da_Terra": {
+      "archiveUrl": "https://web.archive.org/web/20251118042439/https://pt.wikipedia.org/wiki/Comiss%C3%A3o_Pastoral_da_Terra",
+      "timestamp": "20251118042439",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-27T08:19:36.514Z"
+    },
+    "https://www.cptnacional.org.br/publicacoes/noticias/geral/5830-carta-pastoral-nos-50-anos-da-primeira-carta-pastoral-de-pedro-casaldaliga-uma-igreja-da-amazonia-em-conflito-com-o-latifundio-e-a-marginalizacao-social": {
+      "archiveUrl": "https://web.archive.org/web/20240525151445/https://www.cptnacional.org.br/publicacoes/noticias/geral/5830-carta-pastoral-nos-50-anos-da-primeira-carta-pastoral-de-pedro-casaldaliga-uma-igreja-da-amazonia-em-conflito-com-o-latifundio-e-a-marginalizacao-social",
+      "timestamp": "20240525151445",
+      "status": "200",
+      "fresh": false,
+      "checkedAt": "2026-07-27T08:19:36.793Z"
     }
   }
 }
