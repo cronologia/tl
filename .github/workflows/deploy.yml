@@ -56,6 +56,23 @@ jobs:
           fi
           echo "docs/ is in sync."
 
+      # Vendored template scripts drift silently: headerSafe() was added to the
+      # template in cronologia/core#12 and reached exactly one repo, leaving two
+      # repos' link-health runs reporting every reference as inconclusive for
+      # months while looking healthy. cronologia/core#21; this repo's own stale
+      # archive-refs.js went unseen the same way (cronologia/core#33).
+      - name: Check out cronologia/core (for the template drift check)
+        uses: actions/checkout@v4
+        with:
+          repository: cronologia/core
+          path: .core-template
+
+      - name: Template drift check
+        run: python3 .core-template/tools/template-drift.py --scripts scripts --label tl
+
+      - name: Vendored skill drift check
+        run: python3 .core-template/tools/sync-skills.py . --check
+
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main' && vars.ENABLE_PAGES == 'true'
         uses: actions/upload-pages-artifact@v3

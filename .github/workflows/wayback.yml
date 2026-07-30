@@ -1,34 +1,27 @@
-name: Wayback archiving
+name: Wayback preservation
 
-# Preserves every reference URL in the Internet Archive and refreshes the
-# snapshot cache (data/archives.json) that build.js renders as "archived"
-# fallback links. Runs on GitHub's runners because they can reach archive.org,
-# whereas some environments block it by egress policy (ported from fsp ADR-0006).
+# Weekly Internet Archive preservation of every reference URL in
+# data/chronology.json. Runs scripts/archive-refs.js (availability lookup +
+# polite Save Page Now for unarchived URLs), rebuilds the site so the
+# "archived" fallback links render, and commits data/archives.json + docs/
+# when anything changed.
 #
-# - pull_request (script/workflow changes): proves the archiver runs, using a
-#   fast --lookup-only pass; does not commit.
-# - workflow_dispatch / schedule: full Save Page Now capture; commits the
-#   refreshed cache + regenerated docs/ back to the default branch.
+# Template file — projects copy it (with scripts/archive-refs.js) verbatim.
+#
+# Why CI and not a local sandbox (fsp ADR-0006): this must be able to run on
+# GitHub-hosted runners so that when a development sandbox blocks archive.org,
+# the pipeline still runs here — never route around an egress policy.
 
 on:
-  workflow_dispatch:
-    inputs:
-      save_all:
-        description: 'Re-capture every URL even if a snapshot already exists'
-        type: boolean
-        default: false
   schedule:
-    - cron: '23 4 * * 1' # weekly, Mondays 04:23 UTC
-  pull_request:
-    paths:
-      - 'scripts/archive-refs.js'
-      - '.github/workflows/wayback.yml'
+    - cron: '17 6 * * 1' # weekly, Monday 06:17 UTC (off the top of the hour)
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: wayback-archiving
+  group: wayback
   cancel-in-progress: false
 
 jobs:
@@ -42,43 +35,19 @@ jobs:
           node-version: '22'
 
       - name: Archive reference URLs
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            node scripts/archive-refs.js --lookup-only || echo "::warning::archive step failed (archive.org unreachable?)"
-          else
-            node scripts/archive-refs.js ${{ (github.event_name == 'workflow_dispatch' && inputs.save_all) && '--save-all' || '' }} || echo "::warning::archive step failed (archive.org unreachable or some saves failed)"
-          fi
+        run: node scripts/archive-refs.js
 
-      - name: Rebuild site
+      - name: Rebuild site (archive fallback links come from data/archives.json)
         run: node build.js
 
-      - name: Job summary
+      - name: Commit updated archives
         run: |
-          echo "## Wayback archiving" >> "$GITHUB_STEP_SUMMARY"
-          if [ -f data/archives.json ]; then
-            node -e "const d=require('./data/archives.json'); const n=Object.keys(d.snapshots||{}).length; console.log('- Cached snapshots: **'+n+'**'); console.log('- Last run: '+((d._meta&&d._meta.lastRun)||'n/a'));" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "- No cache produced (archive.org may be unreachable from this runner)." >> "$GITHUB_STEP_SUMMARY"
+          if git diff --quiet -- data/archives.json docs/; then
+            echo "No archive changes."
+            exit 0
           fi
-
-      - name: Commit results
-        if: github.event_name != 'pull_request'
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/archives.json docs/ || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
-            git commit -m "chore: refresh Wayback snapshot cache [skip ci]"
-            # main may have advanced while this run worked; rebase and retry so
-            # the generated-data commit isn't lost to a non-fast-forward rejection.
-            n=0
-            until git push; do
-              n=$((n+1))
-              if [ "$n" -ge 4 ]; then echo "::error::push failed after $n attempts"; exit 1; fi
-              echo "::warning::push rejected (main advanced) — rebasing on origin/main and retrying ($n)"
-              git fetch origin main
-              git rebase origin/main || { echo "::error::rebase conflict on generated data"; git rebase --abort; exit 1; }
-            done
-          fi
+          git add data/archives.json docs/
+          git commit -m "Wayback: refresh data/archives.json (scheduled preservation run)"
+          git push
