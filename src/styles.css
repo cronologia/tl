@@ -150,3 +150,5 @@ ol.references a:hover { text-decoration: underline; }
 .atlas-swatch.map-none { background: #dfe3ea; }
 .atlas-credit { color: var(--muted); font-size: .72rem; margin: .3rem 0 0; }
 .map-cards .related-card.map-card-presence { border-left-color: #8cc7a1; }
+.glossary-link { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--accent); }
+.glossary-link:hover { border-bottom-style: solid; }

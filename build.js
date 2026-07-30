@@ -94,6 +94,39 @@ function renderCites(sources, refNumById) {
   return marks ? `<sup class="cite">${marks}</sup>` : '';
 }
 
+const GLOSSARY_BASE = 'https://cronologia.github.io/glossary/';
+// Single source of the marker grammar, shared with the validator. Group 1 is
+// the term-id, group 2 the optional visible text.
+const GLOSSARY_MARKER = /\[\[([a-z0-9][a-z0-9-]*)(?:\|([^\]|]*))?\]\]/;
+
+/** Extract the term-ids referenced by every [[…]] marker in a raw text field. */
+function glossaryMarkerIds(text) {
+  if (typeof text !== 'string' || text.indexOf('[[') === -1) return [];
+  const re = new RegExp(GLOSSARY_MARKER.source, 'g');
+  const ids = [];
+  let m;
+  while ((m = re.exec(text)) !== null) ids.push(m[1]);
+  return ids;
+}
+
+/**
+ * Expand glossary markers in an already-HTML-escaped string. No-op (returns the
+ * input unchanged) when no marker is present, keeping output byte-identical for
+ * marker-free text.
+ */
+function renderGlossaryLinks(escaped) {
+  if (typeof escaped !== 'string' || escaped.indexOf('[[') === -1) return escaped;
+  return escaped.replace(new RegExp(GLOSSARY_MARKER.source, 'g'), (_m, id, label) => {
+    const text = label && label.trim() ? label : id;
+    return `<a class="glossary-link" href="${GLOSSARY_BASE}${id}/">${text}</a>`;
+  });
+}
+
+/** Render a prose text field: escape it, then expand any glossary markers. */
+function renderText(value) {
+  return renderGlossaryLinks(esc(value));
+}
+
 /** Group events by decade for the chronology's section headers. */
 function decadeOf(year) {
   return `${Math.floor(year / 10) * 10}s`;
@@ -103,7 +136,7 @@ function renderEventRow(ev, refNumById) {
   const flag = ev.dateVerified === false
     ? ' <span class="flag" title="Date not yet verified against a primary source">?</span>'
     : '';
-  const text = ev.text ? ` <span class="muted">— ${esc(ev.text)}</span>` : '';
+  const text = ev.text ? ` <span class="muted">— ${renderText(ev.text)}</span>` : '';
   return `        <tr>
           <td class="year">${esc(ev.year)}</td>
           <td>${esc(ev.date || '')}${flag}</td>
@@ -117,8 +150,8 @@ function renderFigureCard(fig, refNumById) {
   return `      <div class="party-card">
         <h3><a href="figures/${esc(figureSlug(fig.name))}.html">${esc(fig.name)}</a></h3>
         ${meta ? `<p class="country">${meta}</p>` : ''}
-        <p class="figures">${esc(fig.role)}${renderCites(fig.sources, refNumById)}</p>
-        ${fig.notes ? `<p class="party-notes">${esc(fig.notes)}</p>` : ''}
+        <p class="figures">${renderText(fig.role)}${renderCites(fig.sources, refNumById)}</p>
+        ${fig.notes ? `<p class="party-notes">${renderText(fig.notes)}</p>` : ''}
       </div>`;
 }
 
@@ -127,8 +160,8 @@ function renderOrgCard(org, refNumById) {
   return `      <div class="related-card">
         <h3>${esc(org.name)}</h3>
         ${meta ? `<p class="related-meta">${meta}</p>` : ''}
-        <p>${esc(org.relation)}${renderCites(org.sources, refNumById)}</p>
-        ${org.notes ? `<p class="related-meta">${esc(org.notes)}</p>` : ''}
+        <p>${renderText(org.relation)}${renderCites(org.sources, refNumById)}</p>
+        ${org.notes ? `<p class="related-meta">${renderText(org.notes)}</p>` : ''}
         ${org.url ? `<p class="related-link"><a href="${esc(org.url)}" rel="noopener noreferrer" target="_blank">${esc(org.url)}</a></p>` : ''}
       </div>`;
 }
@@ -299,7 +332,7 @@ function renderFigurePage(fig, events, tokens, archives, meta, references) {
   const metaLine = [fig.dates, fig.country].filter(Boolean).map(esc).join(' · ');
   const eventRows = related.map((ev) => {
     const flag = ev.dateVerified === false ? ' <span class="flag" title="Date not yet verified against a primary source">?</span>' : '';
-    const text = ev.text ? ` <span class="muted">— ${esc(ev.text)}</span>` : '';
+    const text = ev.text ? ` <span class="muted">— ${renderText(ev.text)}</span>` : '';
     return `        <tr>
           <td class="year">${esc(ev.year)}</td>
           <td>${esc(ev.date || '')}${flag}</td>
@@ -325,7 +358,7 @@ ${ANALYTICS}
       <p class="updated"><a href="../index.html">← ${esc(meta.title)}</a></p>
       <h1>${esc(fig.name)}</h1>
       ${metaLine ? `<p class="subtitle">${metaLine}</p>` : ''}
-      <p class="lead">${esc(fig.role)}${renderCites(fig.sources, localRefById)}</p>
+      <p class="lead">${renderText(fig.role)}${renderCites(fig.sources, localRefById)}</p>
     </div>
   </header>
 
@@ -388,14 +421,14 @@ function renderPage(data, archives) {
   const factRows = (facts || [])
     .map((f) => {
       const flag = f.verified === false ? ' <span class="flag" title="Not yet verified against a primary source">?</span>' : '';
-      return `        <dt>${esc(f.label)}</dt>\n        <dd>${esc(f.value)}${flag}${renderCites(f.sources, refNumById)}</dd>`;
+      return `        <dt>${esc(f.label)}</dt>\n        <dd>${renderText(f.value)}${flag}${renderCites(f.sources, refNumById)}</dd>`;
     })
     .join('\n');
 
   const disambigCards = ((disambiguation && disambiguation.items) || [])
     .map((it) => `      <div class="cp-card">
         <h3>${esc(it.title)}</h3>
-        <p>${esc(it.text)}${renderCites(it.sources, refNumById)}</p>
+        <p>${renderText(it.text)}${renderCites(it.sources, refNumById)}</p>
       </div>`)
     .join('\n');
 
@@ -540,5 +573,6 @@ if (require.main === module) main();
 
 module.exports = {
   esc, formatArchiveTs, renderCites, decadeOf, renderPage,
+  GLOSSARY_BASE, GLOSSARY_MARKER, glossaryMarkerIds, renderGlossaryLinks, renderText,
   figureSlug, buildFigureMatchers, relatedEvents, renderFigurePage,
 };
