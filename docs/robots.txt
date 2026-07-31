@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cronologia.github.io/tl/sitemap.xml
