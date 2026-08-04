@@ -62,6 +62,30 @@ const TRANSLATABLE_KEYS = new Set([
 // Interface strings the compiler emits itself (everything not sourced from data).
 const UI = {
   en: {
+    orgFounded: 'Founded',
+    // Reference kinds are a CLOSED vocabulary, so they live here with the rest
+    // of the chrome rather than in the translation caches: a new type is a code
+    // change that surfaces as a missing label, not a silent English word.
+    refTypes: {
+      "encyclopedia": "encyclopedia",
+      "survey": "survey",
+      "primary": "primary",
+      "official-site": "official site",
+      "academic": "academic",
+      "news": "news",
+      "analysis": "analysis",
+      "obituary": "obituary",
+      "book": "book",
+      "archive": "archive",
+      "organization": "organization",
+      "biography": "biography",
+      "legal": "legal",
+      "publisher": "publisher",
+      "commentary": "commentary",
+      "official": "official",
+      "journal": "journal",
+      "reference": "reference",
+    },
     about: 'About', chronology: 'Chronology', figures: 'Key figures',
     organizations: 'Organizations', disambiguation: 'Disambiguation', references: 'References',
     figuresHeading: 'Key figures', organizationsHeading: 'Related organizations',
@@ -106,6 +130,27 @@ const UI = {
     disclaimer: null,
   },
   es: {
+    orgFounded: 'Fundada en',
+    refTypes: {
+      "encyclopedia": "enciclopedia",
+      "survey": "panorama",
+      "primary": "primaria",
+      "official-site": "sitio oficial",
+      "academic": "académica",
+      "news": "prensa",
+      "analysis": "análisis",
+      "obituary": "obituario",
+      "book": "libro",
+      "archive": "archivo",
+      "organization": "organización",
+      "biography": "biografía",
+      "legal": "jurídica",
+      "publisher": "editorial",
+      "commentary": "comentario",
+      "official": "oficial",
+      "journal": "revista",
+      "reference": "obra de referencia",
+    },
     about: 'Acerca de', chronology: 'Cronología', figures: 'Figuras clave',
     organizations: 'Organizaciones', disambiguation: 'Desambiguación', references: 'Referencias',
     figuresHeading: 'Figuras clave', organizationsHeading: 'Organizaciones relacionadas',
@@ -150,6 +195,27 @@ const UI = {
     disclaimer: 'Traducción automática del inglés; la página en inglés es la versión de referencia.',
   },
   pt: {
+    orgFounded: 'Fundada em',
+    refTypes: {
+      "encyclopedia": "enciclopédia",
+      "survey": "panorama",
+      "primary": "primária",
+      "official-site": "site oficial",
+      "academic": "acadêmica",
+      "news": "imprensa",
+      "analysis": "análise",
+      "obituary": "obituário",
+      "book": "livro",
+      "archive": "arquivo",
+      "organization": "organização",
+      "biography": "biografia",
+      "legal": "jurídica",
+      "publisher": "editora",
+      "commentary": "comentário",
+      "official": "oficial",
+      "journal": "revista",
+      "reference": "obra de referência",
+    },
     about: 'Sobre', chronology: 'Cronologia', figures: 'Figuras-chave',
     organizations: 'Organizações', disambiguation: 'Desambiguação', references: 'Referências',
     figuresHeading: 'Figuras-chave', organizationsHeading: 'Organizações relacionadas',
@@ -224,20 +290,36 @@ function translator(dict) {
  * empty dictionary (English) the values are unchanged, so the render stays
  * byte-identical to a pre-i18n build.
  */
+/** The narrow allowlist that applies INSIDE `references` (core#52).
+ *
+ * A reference NAMES its source in `publisher` and CHARACTERISES it in
+ * `publisherNote` — "Evolian-sympathetic site — labeled as such", "skeptical
+ * review". The name is bibliography and stays verbatim; the characterisation
+ * is this project writing in its own voice, and it is the half that makes
+ * "sources span the spectrum" legible to a reader rather than a claim in the
+ * intro. The wholesale skip this replaced left it in English on every
+ * localized page.
+ *
+ * An allowlist rather than a boolean: a new key inside a reference stays
+ * untranslated by default, the safe direction for citation data.
+ */
+const REFERENCE_TRANSLATABLE = new Set(['publisherNote']);
+
 function localizeData(data, dict, lang) {
   const t = translator(dict);
-  const walk = (val, key) => {
-    if (key === 'references') return val; // never translate bibliographic entries
-    if (Array.isArray(val)) return val.map((v) => walk(v, key));
+  const walk = (val, key, inRefs) => {
+    const keys = inRefs ? REFERENCE_TRANSLATABLE : TRANSLATABLE_KEYS;
+    const refs = inRefs || key === 'references';
+    if (Array.isArray(val)) return val.map((v) => walk(v, key, refs));
     if (val && typeof val === 'object') {
       const out = {};
-      for (const k of Object.keys(val)) out[k] = walk(val[k], k);
+      for (const k of Object.keys(val)) out[k] = walk(val[k], k, refs);
       return out;
     }
-    if (typeof val === 'string' && TRANSLATABLE_KEYS.has(key)) return t(val);
+    if (typeof val === 'string' && keys.has(key)) return t(val);
     return val;
   };
-  const copy = walk(data, null);
+  const copy = walk(data, null, false);
   copy.meta = Object.assign({}, copy.meta, { language: lang });
   // `place` IS translated prose (the chronology's Place column reads in the
   // page's language), but the gazetteer behind the places map is keyed on the
@@ -1511,8 +1593,11 @@ function renderFigureCard(fig, refNumById) {
       </div>`;
 }
 
-function renderOrgCard(org, refNumById) {
-  const meta = [org.founded ? `Founded ${org.founded}` : null, org.place].filter(Boolean).map(esc).join(' · ');
+function renderOrgCard(org, refNumById, ui) {
+  // 'Founded' is chrome. Hardcoded, it rendered in English on the es and pt
+  // pages beside a place name that HAD been translated.
+  const foundedLabel = (ui && ui.orgFounded) || 'Founded';
+  const meta = [org.founded ? `${foundedLabel} ${org.founded}` : null, org.place].filter(Boolean).map(esc).join(' · ');
   return `      <div class="related-card">
         <h3>${esc(org.name)}</h3>
         ${meta ? `<p class="related-meta">${meta}</p>` : ''}
@@ -1522,14 +1607,25 @@ function renderOrgCard(org, refNumById) {
       </div>`;
 }
 
-function renderReference(r, n, archives) {
+/** A reference line: the citation, then this project's own note about it.
+ *
+ * `publisher` NAMES the source and is bibliographic — verbatim in every
+ * locale. `publisherNote` CHARACTERISES it and is prose, so it translates.
+ * They render reassembled, so the English page is unchanged.
+ */
+function renderReference(r, n, archives, ui) {
   const snap = archives[r.url];
   const archived = snap && snap.archiveUrl
     ? ` · <a class="archive-link" href="${esc(snap.archiveUrl)}" rel="noopener noreferrer" target="_blank">🗄 archived${snap.timestamp ? ` ${esc(formatArchiveTs(snap.timestamp))}` : ''}</a>`
     : '';
+  const pub = r.publisherNote ? `${r.publisher} (${r.publisherNote})` : r.publisher;
+  // `type` is a CLOSED vocabulary, not prose: it belongs in the UI table with
+  // the rest of the chrome, so a new type surfaces as a missing label rather
+  // than a silent English word on a Portuguese page.
+  const type = (ui && ui.refTypes && ui.refTypes[r.type]) || r.type;
   return `        <li id="ref-${n}">
           <a href="${esc(r.url)}" rel="noopener noreferrer" target="_blank">${esc(r.title)}</a>${archived}
-          <span class="ref-meta">${esc(r.publisher)} · ${esc(r.type)}</span>
+          <span class="ref-meta">${esc(pub)} · ${esc(type)}</span>
         </li>`;
 }
 
@@ -1763,7 +1859,7 @@ ${figures.map((f) => renderFigureCard(f, refNumById)).join('\n')}
     <section id="organizations">
       <h2>${esc(ui.organizationsHeading)}</h2>
       <div class="party-grid">
-${(organizations || []).map((o) => renderOrgCard(o, refNumById)).join('\n')}
+${(organizations || []).map((o) => renderOrgCard(o, refNumById, ui)).join('\n')}
       </div>
     </section>
 
@@ -1779,7 +1875,7 @@ ${disambigCards}
       <h2>${esc(ui.referencesHeading)}</h2>
       <p class="section-intro">${ui.refsIntro(references.length, archivedRefs)}</p>
       <ol class="references">
-${references.map((r, i) => renderReference(r, i + 1, archives)).join('\n')}
+${references.map((r, i) => renderReference(r, i + 1, archives, ui)).join('\n')}
       </ol>
     </section>
   </main>
@@ -1949,7 +2045,7 @@ function renderFigurePage(fig, related, archives, data, opts) {
         </tr>`;
   }).join('\n');
 
-  const refList = localRefs.map((r, i) => renderReference(r, i + 1, archives)).join('\n');
+  const refList = localRefs.map((r, i) => renderReference(r, i + 1, archives, ui)).join('\n');
   const alt = LOCALES.map((l) => `  <link rel="alternate" hreflang="${l}" href="${esc(base + l + '/' + route)}">`).join('\n');
   const switcher = `<nav class="lang-switch" aria-label="${esc(ui.language)}">${LOCALES.map((l) => (l === lang
     ? `<span class="lang-current" aria-current="true">${l.toUpperCase()}</span>`
