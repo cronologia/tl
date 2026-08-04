@@ -2,7 +2,7 @@
  "_comment": "GENERATED — vendored copies of cronologia/core skills/. Do not edit here; edit in cronologia/core and re-run core/tools/sync-skills.py. Verify with --check.",
  "source": "cronologia/core",
  "sourcePath": "skills/",
- "syncedAt": "2026-07-30",
+ "syncedAt": "2026-08-04",
  "tool": "core/tools/sync-skills.py",
  "skills": [
   {
@@ -32,8 +32,8 @@
   },
   {
    "name": "mine-video",
-   "sha256": "10cb6049ea518ed724b96d0da65e412a9d39b660770c58447947fa52dc5a7786",
-   "bytes": 2220
+   "sha256": "0f19207c9e54487cb9fd844611c14c463a4f4f3b9ba2f69a994b6d870c707ee3",
+   "bytes": 2662
   },
   {
    "name": "net-access",
