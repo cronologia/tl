@@ -305,6 +305,30 @@ function translator(dict) {
  */
 const REFERENCE_TRANSLATABLE = new Set(['publisherNote']);
 
+/**
+ * Every string this build would send through the dictionaries, in walk order,
+ * deduplicated. Mirrors localizeData's walk below, INCLUDING the reference
+ * subtree -- which is the half scripts/translate.js used to miss, so its
+ * coverage number omitted every `publisherNote` these pages actually render
+ * (cronologia/core#81, #82). A test asserts the two visit the same set.
+ */
+function collectTranslatable(data) {
+  const out = [];
+  const seen = new Set();
+  const walk = (val, key, inRefs) => {
+    const keys = inRefs ? REFERENCE_TRANSLATABLE : TRANSLATABLE_KEYS;
+    const refs = inRefs || key === 'references';
+    if (Array.isArray(val)) { val.forEach((v) => walk(v, key, refs)); return; }
+    if (val && typeof val === 'object') { for (const k of Object.keys(val)) walk(val[k], k, refs); return; }
+    if (typeof val === 'string' && val.trim() && keys.has(key) && !seen.has(val)) {
+      seen.add(val);
+      out.push(val);
+    }
+  };
+  walk(data, null, false);
+  return out;
+}
+
 function localizeData(data, dict, lang) {
   const t = translator(dict);
   const walk = (val, key, inRefs) => {
@@ -2206,5 +2230,6 @@ module.exports = {
   loadPlaces, loadWorld,
   renderPage,
   LOCALES, ROUTES, OG_LOCALE, UI, loadDict, siteBase, translator, localizeData,
+  TRANSLATABLE_KEYS, collectTranslatable,
   alternates, seoHead, langSwitcher, renderRootStub, renderSitemap, renderRobots,
 };

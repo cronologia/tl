@@ -80,3 +80,49 @@ test('localizeData translates whitelisted prose, sets lang, and never touches re
   const en = localizeData(data, {}, 'en');
   assert.equal(JSON.stringify(en.events), JSON.stringify(data.events));
 });
+
+
+// --- collectTranslatable: the coverage report and the renderer, same set -----
+//
+// scripts/translate.js used to keep its own copy of the rules, under a comment
+// saying the copy must mirror build.js's. It did not: it skipped the whole
+// `references` array, so the coverage number omitted every `publisherNote`
+// these pages render, and a no-flag run PRUNED those keys out of the cache.
+// The two walks now come from one place; this pins them to one answer.
+//
+// The assertion is not "does it collect the right keys" but "is it the SAME
+// set", derived by instrumenting localizeData.
+const { collectTranslatable } = require('../build.js');
+const fs2 = require('node:fs');
+const path2 = require('node:path');
+
+/**
+ * Every string localizeData actually hands to the translator.
+ *
+ * The lookup is `Object.prototype.hasOwnProperty.call(dict, s)`, which on a
+ * Proxy fires `getOwnPropertyDescriptor` -- not `has`, and not `get`. Trapping
+ * the wrong one yields an empty list and the comparison would pass for the
+ * wrong reason, so the trap is asserted to have fired. Empty strings are
+ * dropped: localizeData passes them through harmlessly while
+ * collectTranslatable filters them, because listing "" as awaiting translation
+ * is noise in a coverage report.
+ */
+function stringsSeenByLocalize(data) {
+  const seen = [];
+  const dict = new Proxy({}, {
+    getOwnPropertyDescriptor: (_t, k) => { if (typeof k === 'string') seen.push(k); return undefined; },
+  });
+  localizeData(data, dict, 'es');
+  assert.ok(seen.length > 0, 'instrumentation failed: the translator lookup was never observed');
+  return seen.filter((s) => s.trim());
+}
+
+test('collectTranslatable returns exactly the strings localizeData translates', () => {
+  const data = JSON.parse(fs2.readFileSync(path2.join(__dirname, '..', 'data', 'chronology.json'), 'utf8'));
+  const collected = collectTranslatable(data);
+  const localized = stringsSeenByLocalize(data);
+  assert.deepEqual(new Set(collected), new Set(localized),
+    'the coverage walk and the render walk disagree - one of them is lying about what gets translated');
+  assert.equal(collected.length, new Set(collected).size, 'collectTranslatable must deduplicate');
+  assert.ok(collected.length > 0, 'the dataset has translatable prose');
+});
