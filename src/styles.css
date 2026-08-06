@@ -383,6 +383,7 @@ figure.places-map figcaption { font-size: .78rem; color: var(--muted); margin-to
 @media print {
   #map .atlas-map { break-inside: avoid; page-break-inside: avoid; }
   .latam-c, .atlas-swatch { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
 
 /* ---------------------------------------------------------------------------
    Swimlanes — the thread-lane figure (core#23).
