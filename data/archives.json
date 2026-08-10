@@ -1,6 +1,6 @@
 {
   "generatedBy": "scripts/archive-refs.js",
-  "updatedAt": "2026-08-03",
+  "updatedAt": "2026-08-10",
   "snapshots": {
     "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/": {
       "archiveUrl": "https://web.archive.org/web/20260515070220/https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
@@ -76,6 +76,12 @@
       "status": "200",
       "fresh": false,
       "checkedAt": "2026-07-20T11:59:24.653Z"
+    },
+    "https://digitalarchives.episcopalarchives.org/cgi-bin/ENS/ENSpress_release.pl?pr_number=92179E": {
+      "refId": "ens-boff",
+      "archiveUrl": "https://web.archive.org/web/20260803100811/https://digitalarchives.episcopalarchives.org/cgi-bin/ENS/ENSpress_release.pl?pr_number=92179E",
+      "timestamp": "20260803100811",
+      "checkedAt": "2026-08-10"
     },
     "https://en.wikipedia.org/wiki/%C3%93scar_Romero": {
       "archiveUrl": "https://web.archive.org/web/20260629164214/https://en.wikipedia.org/wiki/%C3%93scar_Romero",
