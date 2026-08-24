@@ -1,6 +1,6 @@
 {
   "generatedBy": "scripts/archive-refs.js",
-  "updatedAt": "2026-08-17",
+  "updatedAt": "2026-08-24",
   "snapshots": {
     "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/": {
       "archiveUrl": "https://web.archive.org/web/20260515070220/https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
@@ -278,6 +278,12 @@
       "fresh": false,
       "checkedAt": "2026-07-20T11:59:06.205Z"
     },
+    "https://peoplesdispatch.org/2026/02/18/the-return-of-camilo-torres/": {
+      "refId": "peoples-dispatch-torres-return",
+      "archiveUrl": "https://web.archive.org/web/20260824073027/https://peoplesdispatch.org/2026/02/18/the-return-of-camilo-torres/",
+      "timestamp": "20260824073027",
+      "checkedAt": "2026-08-24"
+    },
     "https://perspectivasonline.com.br/": {
       "archiveUrl": "https://web.archive.org/web/20260516051602/https://perspectivasonline.com.br/",
       "timestamp": "20260516051602",
@@ -456,6 +462,12 @@
       "archiveUrl": "https://web.archive.org/web/20260727081250/https://www.celam.org/web/content/9179",
       "timestamp": "20260727081250",
       "checkedAt": "2026-08-03"
+    },
+    "https://www.celam.org/web/content/9186": {
+      "refId": "aparecida-doc",
+      "archiveUrl": "https://web.archive.org/web/20260824073535/https://www.celam.org/web/content/9186",
+      "timestamp": "20260824073535",
+      "checkedAt": "2026-08-24"
     },
     "https://www.cnbb.org.br/morre-bispo-emerito-da-prelazia-de-sao-felix-do-araguaia-mt-dom-pedro-casaldaliga/": {
       "archiveUrl": "https://web.archive.org/web/20260308184547/https://www.cnbb.org.br/morre-bispo-emerito-da-prelazia-de-sao-felix-do-araguaia-mt-dom-pedro-casaldaliga/",
