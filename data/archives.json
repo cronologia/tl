@@ -1,6 +1,6 @@
 {
   "generatedBy": "scripts/archive-refs.js",
-  "updatedAt": "2026-08-24",
+  "updatedAt": "2026-08-31",
   "snapshots": {
     "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/": {
       "archiveUrl": "https://web.archive.org/web/20260515070220/https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
@@ -607,6 +607,12 @@
       "archiveUrl": "https://web.archive.org/web/20260727080325/https://www.periodistadigital.com/old/852201.shtml",
       "timestamp": "20260727080325",
       "checkedAt": "2026-08-03"
+    },
+    "https://www.publishersweekly.com/978-0-671-64114-6": {
+      "refId": "pw-fidel-religion",
+      "archiveUrl": "https://web.archive.org/web/20260824073203/https://www.publishersweekly.com/978-0-671-64114-6",
+      "timestamp": "20260824073203",
+      "checkedAt": "2026-08-31"
     },
     "https://www.revistas.una.ac.cr/index.php/siwo/article/download/19901/30689/91703?inline=1": {
       "archiveUrl": "https://web.archive.org/web/20251108125211/https://www.revistas.una.ac.cr/index.php/siwo/article/download/19901/30689/91703?inline=1",
