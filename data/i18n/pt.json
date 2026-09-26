@@ -2,9 +2,13 @@
   "_meta": {
     "targetLang": "pt",
     "generatedBy": "LLM translation (Claude); English is authoritative (core#9). Attribution hedges preserved throughout. NOTE for pt readers especially: quotations (Medellín language, CDF instructions, papal letters, the Boff exchange) are translations of the ENGLISH rendering, NOT restorations of the original documents' wording — several originals are Portuguese or Spanish; consult the cited sources. Glossary [[markers]] keep their ids; only visible labels are translated.",
-    "keying": "exact English source string from data/chronology.json"
+    "keying": "exact English source string from data/chronology.json",
+    "coverage": "268/268"
   },
   "strings": {
+    "1955": "1955",
+    "1961": "1961",
+    "1971": "1971",
     "'Fidel e a Religião' (Fidel and Religion)": "'Fidel e a Religião'",
     "'On the Side of the Poor': Gutiérrez and Cardinal Müller": "'On the Side of the Poor': Gutiérrez e o cardeal Müller",
     "1968–1971 — from the reception of the Second Vatican Council at the 1968 Medellín conference (CELAM II) to Gustavo Gutiérrez's foundational book (Lima, 1971).": "1968–1971 — da recepção do Concílio Vaticano II na conferência de Medellín de 1968 (CELAM II) ao livro fundacional de Gustavo Gutiérrez (Lima, 1971).",

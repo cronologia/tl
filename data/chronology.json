@@ -4,6 +4,7 @@
     "subtitle": "Chronology of Liberation Theology (1960s–present)",
     "description": "An open, source-referenced chronology of Teologia da Libertação (Liberation Theology) — the Latin American theological movement that emerged from the Second Vatican Council and the 1968 Medellín conference — its key figures, its confrontation with the Vatican, and its later reception.",
     "language": "en",
+    "layout": "river",
     "siteUrl": "https://cronologia.github.io/tl/",
     "lastUpdated": "2026-07-20",
     "dataQualityNote": "This is a work-in-progress dataset compiled from public sources (see references). Liberation Theology is a politically and theologically contested subject: contested claims are attributed to their authors, never asserted in the site's own voice, and dates not yet verified against a primary source are flagged with a ? mark. Corrections against primary sources are welcome."
@@ -1463,63 +1464,63 @@
       "title": "Populorum Progressio (encyclical of Paul VI, 26 March 1967)",
       "url": "https://www.vatican.va/content/paul-vi/en/encyclicals/documents/hf_p-vi_enc_26031967_populorum.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "libertatis-nuntius",
       "title": "Libertatis Nuntius — Instruction on Certain Aspects of the 'Theology of Liberation' (CDF, 6 August 1984)",
       "url": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_19840806_theology-liberation_en.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "libertatis-conscientia",
       "title": "Libertatis Conscientia — Instruction on Christian Freedom and Liberation (CDF, 22 March 1986)",
       "url": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_19860322_freedom-liberation_en.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "notif-boff",
       "title": "Notification on the book 'Church: Charism and Power' by Fr. Leonardo Boff (CDF, 11 March 1985)",
       "url": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_19850311_notif-boff_en.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "notif-sobrino",
       "title": "Notification on the works of Fr. Jon Sobrino, SJ (CDF, 26 November 2006)",
       "url": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_20061126_notification-sobrino_en.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "jp2-puebla-address",
       "title": "Address of John Paul II at the opening of the Puebla Conference (28 January 1979)",
       "url": "https://www.vatican.va/content/john-paul-ii/en/speeches/1979/january/documents/hf_jp-ii_spe_19790128_messico-puebla-episc-latam.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "benedict-aparecida-address",
       "title": "Address of Benedict XVI at the inaugural session of Aparecida (13 May 2007)",
       "url": "https://www.vatican.va/content/benedict-xvi/en/speeches/2007/may/documents/hf_ben-xvi_spe_20070513_conference-aparecida.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "dilexi-te",
       "title": "Dilexi te — Apostolic Exhortation of Leo XIV on love for the poor (4 October 2025)",
       "url": "https://www.vatican.va/content/leo-xiv/en/apost_exhortations/documents/20251004-dilexi-te.html",
       "publisher": "Holy See (vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "puebla-doc",
       "title": "Documento de Puebla — III Conferencia General del Episcopado Latinoamericano (1979)",
       "url": "https://www.celam.org/web/content/9170",
       "publisher": "CELAM",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "celam-adn",
@@ -1800,7 +1801,7 @@
       "title": "From Madness to Hope: Report of the UN Commission on the Truth for El Salvador (1993)",
       "url": "https://www.derechos.org/nizkor/salvador/informes/truth.html",
       "publisher": "United Nations (via Equipo Nizkor)",
-      "type": "primary"
+      "type": "report"
     },
     {
       "id": "ncr-sobrino-response",
@@ -1961,7 +1962,7 @@
       "title": "Explanatory Note on the Notification on the works of Fr. Jon Sobrino, SJ",
       "url": "https://www.vatican.va/roman_curia/congregations/cfaith/documents/rc_con_cfaith_doc_20061126_nota-sobrino_en.html",
       "publisher": "Holy See",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "bu-bce-segundo",
@@ -2080,7 +2081,7 @@
       "title": "Funeral Mass for Cardinal Alfonso López Trujillo — Homily of Benedict XVI (23 April 2008)",
       "url": "https://www.vatican.va/content/benedict-xvi/en/homilies/2008/documents/hf_ben-xvi_hom_20080423_card-trujillo.html",
       "publisher": "Holy See (Vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "catholic-hierarchy-casaldaliga",
@@ -2094,49 +2095,49 @@
       "title": "Lettera alla Conferenza Episcopale Brasiliana (9 aprile 1986)",
       "url": "https://www.vatican.va/content/john-paul-ii/it/letters/1986/documents/hf_jp-ii_let_19860409_conf-episcopale-brasile.html",
       "publisher": "Holy See (Vatican.va)",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "medellin-doc",
       "title": "Documento Conclusivo de Medellín — II Conferencia General del Episcopado Latinoamericano (1968)",
       "url": "https://www.celam.org/web/content/9160",
       "publisher": "CELAM",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "santo-domingo-doc",
       "title": "Documento de Santo Domingo — IV Conferencia General del Episcopado Latinoamericano (1992)",
       "url": "https://www.celam.org/web/content/9179",
       "publisher": "CELAM",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "aparecida-doc",
       "title": "Documento Conclusivo de Aparecida — V Conferencia General del Episcopado Latinoamericano y del Caribe (2007)",
       "url": "https://www.celam.org/web/content/9186",
       "publisher": "CELAM",
-      "type": "primary"
+      "type": "official"
     },
     {
       "id": "orbis-theology-of-liberation",
       "title": "A Theology of Liberation: History, Politics, and Salvation (Gustavo Gutiérrez)",
       "url": "https://orbisbooks.com/products/9781626985414",
       "publisher": "Orbis Books",
-      "type": "primary"
+      "type": "book"
     },
     {
       "id": "boff-como-fazer-tl-1986",
       "title": "Como fazer teologia da libertação (Clodovis Boff & Leonardo Boff)",
       "url": "https://books.google.com/books/about/Como_fazer_teologia_da_liberta%C3%A7%C3%A3o.html?id=aMZWRwAACAAJ",
       "publisher": "Editora Vozes, Petrópolis",
-      "type": "primary"
+      "type": "book"
     },
     {
       "id": "segundo-liberacion-teologia",
       "title": "The Liberation of Theology (Juan Luis Segundo, Orbis 1976)",
       "url": "https://archive.org/details/liberationoftheo0000segu",
       "publisher": "Orbis Books (via Internet Archive)",
-      "type": "primary"
+      "type": "book"
     },
     {
       "id": "neamp-betto",
@@ -2164,7 +2165,7 @@
       "title": "A idolatria do mercado: ensaio sobre economia e teologia (Assmann & Hinkelammert)",
       "url": "https://books.google.com/books/about/A_idolatria_do_mercado.html?id=Ix65AAAAIAAJ",
       "publisher": "Editora Vozes, Petrópolis",
-      "type": "primary"
+      "type": "book"
     },
     {
       "id": "cpt-fundacao",
@@ -2178,7 +2179,7 @@
       "title": "Carta Pastoral nos 50 anos da primeira Carta Pastoral de Pedro Casaldáliga",
       "url": "https://www.cptnacional.org.br/publicacoes/noticias/geral/5830-carta-pastoral-nos-50-anos-da-primeira-carta-pastoral-de-pedro-casaldaliga-uma-igreja-da-amazonia-em-conflito-com-o-latifundio-e-a-marginalizacao-social",
       "publisher": "Comissão Pastoral da Terra (CPT)",
-      "type": "primary"
+      "type": "official"
     }
   ]
 }
