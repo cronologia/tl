@@ -45,6 +45,11 @@ else {
   if (d.meta.lastUpdated && !/^\d{4}-\d{2}-\d{2}$/.test(d.meta.lastUpdated)) {
     err(`meta.lastUpdated must be YYYY-MM-DD, got ${d.meta.lastUpdated}`);
   }
+  // Which layout the chronology section uses (core#108). Absent = the table.
+  if (d.meta.layout !== undefined) {
+    const { RIVER_LAYOUTS } = require('../build.js');
+    if (!RIVER_LAYOUTS.has(d.meta.layout)) err(`meta.layout must be one of ${[...RIVER_LAYOUTS].map((v) => JSON.stringify(v)).join(', ')}, got ${JSON.stringify(d.meta.layout)}`);
+  }
   // Optional header pill links to visual sections (viz-chips).
   if (d.meta.vizChips !== undefined) {
     if (!isArr(d.meta.vizChips)) err('meta.vizChips must be an array');
@@ -103,7 +108,10 @@ if (!isArr(d.events) || d.events.length === 0) err('events[] missing or empty');
 else {
   d.events.forEach((ev, i) => {
     const at = `events[${i}]`;
-    if (!isNum(ev.year) || ev.year < 1500 || ev.year > 2100) err(`${at}.year must be a plausible number`);
+    // A negative year is that many years BCE (-4 is 4 BCE); there is no year 0.
+    // Ancient events carry no ISO `date` — the exact day goes in `dateNote`.
+    if (!isNum(ev.year) || ev.year < -100 || ev.year > 2100) err(`${at}.year must be a plausible number (-100..2100; negative = BCE)`);
+    else if (ev.year === 0) err(`${at}.year is 0 — there is no year 0: 1 BCE is -1, 1 CE is 1`);
     if (!isStr(ev.title)) err(`${at}.title missing`);
     if (ev.date !== undefined && !isStr(ev.date)) err(`${at}.date must be a string`);
     if (typeof ev.dateVerified !== 'boolean') err(`${at}.dateVerified must be boolean`);
@@ -375,6 +383,57 @@ if (d.placesMap !== undefined) {
         + '\n  Add them to cronologia/core data/places.json and re-run scripts/sync-places.js.'
       );
     }
+  }
+}
+
+// ---- catalogue (objects, where they are kept, and their images) -----------
+// Unlike an event's place, an item's `site` is the whole point of its map
+// marker, so an unresolved site is an ERROR here. Images are publications:
+// each must carry a licence from the free vocabulary and full attribution,
+// and its file must exist — a missing file ships a broken image.
+if (d.catalogue !== undefined) {
+  const cat = d.catalogue;
+  const at = 'catalogue';
+  if (cat === null || typeof cat !== 'object' || Array.isArray(cat)) {
+    err(`${at} must be an object`);
+  } else if (!isArr(cat.items) || cat.items.length === 0) {
+    err(`${at}.items must be a non-empty array`);
+  } else {
+    let gaz = null;
+    try { gaz = JSON.parse(fs.readFileSync(path.join(ROOT, PLACES_FILE), 'utf8')); } catch (e) {
+      err(`${at} is declared but ${PLACES_FILE} is missing or unreadable (${e.message}). Run: node scripts/sync-places.js`);
+    }
+    const index = gaz ? placeIndex(gaz) : null;
+    const { CATALOGUE_LICENSES } = require('../build.js');
+    const ids = new Set();
+    cat.items.forEach((it, i) => {
+      const iAt = `${at}.items[${i}]`;
+      if (!isStr(it.id) || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(it.id)) err(`${iAt}.id must be kebab-case`);
+      else if (ids.has(it.id)) err(`${iAt}.id duplicated: ${it.id}`);
+      else ids.add(it.id);
+      if (!isStr(it.name)) err(`${iAt}.name missing`);
+      if (!isStr(it.site)) err(`${iAt}.site missing (the gazetteer name of the building)`);
+      else if (index) {
+        const { missing } = resolvePlaceString(it.site, index);
+        if (missing.length) err(`${iAt}.site "${it.site}" is not in ${PLACES_FILE}; add it to cronologia/core data/places.json and run scripts/sync-places.js`);
+      }
+      for (const k of ['where', 'object', 'visibility', 'attested', 'dating', 'church']) {
+        if (it[k] !== undefined && !isStr(it[k])) err(`${iAt}.${k} must be a string`);
+      }
+      checkSources(iAt, it.sources, true);
+      if (it.image !== undefined) {
+        const im = it.image; const mAt = `${iAt}.image`;
+        if (!isStr(im.file) || im.file.includes('/') || im.file.includes('..')) err(`${mAt}.file must be a bare filename in src/img/`);
+        else if (!fs.existsSync(path.join(ROOT, 'src', 'img', im.file))) err(`${mAt}.file src/img/${im.file} does not exist`);
+        if (!isStr(im.license) || !CATALOGUE_LICENSES.test(im.license)) {
+          err(`${mAt}.license "${im.license}" is not a free licence this site may publish (Public domain, CC0, CC BY, CC BY-SA)`);
+        }
+        for (const k of ['credit', 'sourceUrl', 'alt']) if (!isStr(im[k])) err(`${mAt}.${k} missing (attribution is required)`);
+        if (isStr(im.sourceUrl) && !/^https:\/\//.test(im.sourceUrl)) err(`${mAt}.sourceUrl must be an https URL`);
+        if (/BY/.test(im.license || '') && !isStr(im.licenseUrl)) err(`${mAt}.licenseUrl missing (CC BY licences require a link to the licence)`);
+        for (const k of ['width', 'height']) if (im[k] !== undefined && !isNum(im[k])) err(`${mAt}.${k} must be a number`);
+      }
+    });
   }
 }
 

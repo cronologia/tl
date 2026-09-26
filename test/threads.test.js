@@ -32,16 +32,23 @@ function runValidator(mutate) {
   fs.mkdirSync(path.join(dir, 'data'));
   fs.copyFileSync(path.join(ROOT, 'build.js'), path.join(dir, 'build.js'));
   fs.copyFileSync(path.join(ROOT, 'scripts', 'validate-data.js'), path.join(dir, 'scripts', 'validate-data.js'));
-  fs.copyFileSync(path.join(ROOT, 'data', 'glossary-terms.json'), path.join(dir, 'data', 'glossary-terms.json'));
+  if (fs.existsSync(path.join(ROOT, 'data', 'glossary-terms.json'))) fs.copyFileSync(path.join(ROOT, 'data', 'glossary-terms.json'), path.join(dir, 'data', 'glossary-terms.json'));
   // The example dataset now carries a `map` block, whose validation reads the
   // vendored base map — copy it so the scratch validates the real fixture.
   fs.mkdirSync(path.join(dir, 'src'));
-  fs.copyFileSync(path.join(ROOT, 'src', 'latam.svg'), path.join(dir, 'src', 'latam.svg'));
+  if (fs.existsSync(path.join(ROOT, 'src', 'latam.svg'))) fs.copyFileSync(path.join(ROOT, 'src', 'latam.svg'), path.join(dir, 'src', 'latam.svg'));
   // A base dataset that declares placesMap needs the gazetteer beside it, or
   // the validator fails on the map rather than on the threads under test.
   const places = path.join(ROOT, 'data', 'places.json');
   if (fs.existsSync(places)) fs.copyFileSync(places, path.join(dir, 'data', 'places.json'));
   const d = JSON.parse(JSON.stringify(base));
+  // Start from a threads-FREE base. An adopting repo's real dataset may already
+  // declare a taxonomy and tag its events, and those real lane ids would be
+  // "unknown" under this test's fixture taxonomy — so the suite would pass only
+  // until the repo actually adopted lanes, which is the moment it most needs to
+  // work. Strip both so each case tests exactly what it sets up.
+  delete d.meta.threads;
+  for (const ev of d.events || []) delete ev.threads;
   mutate(d);
   fs.writeFileSync(path.join(dir, 'data', 'chronology.json'), JSON.stringify(d));
   try {
