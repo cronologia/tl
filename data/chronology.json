@@ -1527,7 +1527,7 @@
       "title": "A un año de la Primera Asamblea Eclesial de América Latina y el Caribe",
       "url": "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
       "publisher": "ADN CELAM",
-      "type": "official-site"
+      "type": "news"
     },
     {
       "id": "celats-gutierrez",
@@ -1597,7 +1597,7 @@
       "title": "Pope Francis lifts suspension on Fr. Ernesto Cardenal",
       "url": "https://www.vaticannews.va/en/pope/news/2019-02/pope-francis-lifts-sanctions-ernesto-cardenal.html",
       "publisher": "Vatican News",
-      "type": "official-site"
+      "type": "news"
     },
     {
       "id": "civilta-aparecida",
@@ -1661,7 +1661,7 @@
       "title": "In memoriam: Rev. Gustavo Gutiérrez, O.P., renowned Notre Dame theologian, father of 'liberation theology'",
       "url": "https://news.nd.edu/news/in-memoriam-rev-gustavo-gutierrez-o-p-renowned-notre-dame-theologian-founder-of-liberation-theology/",
       "publisher": "University of Notre Dame",
-      "type": "obituary"
+      "type": "news"
     },
     {
       "id": "orbis-side-of-poor",
@@ -1822,7 +1822,7 @@
       "title": "The ecumenical movement remembers Rubem Alves, 1933-2014",
       "url": "https://www.oikoumene.org/news/the-ecumenical-movement-remembers-rubem-alves-1933-2014",
       "publisher": "World Council of Churches",
-      "type": "obituary"
+      "type": "news"
     },
     {
       "id": "nsarchive-jesuits-verdict",
@@ -1843,7 +1843,7 @@
       "title": "Memória dos Intereclesiais — Encontros Intereclesiais das CEBs",
       "url": "https://cebsdobrasil.com.br/intereclesiais/",
       "publisher": "CEBs do Brasil",
-      "type": "organization"
+      "type": "official"
     },
     {
       "id": "perspectivas-alves-joy",
@@ -1857,7 +1857,7 @@
       "title": "Hugo Assmann, um dos precursores da Teologia da Libertação",
       "url": "https://www.oexplorador.com.br/hugo-assmann/",
       "publisher": "O Explorador",
-      "type": "biography"
+      "type": "web"
     },
     {
       "id": "upi-cardenal-1983",
@@ -1878,14 +1878,14 @@
       "title": "Rutilio Grande SJ",
       "url": "https://www.romerotrust.org.uk/martyrs/rutilio-grande-sj/",
       "publisher": "The Archbishop Romero Trust",
-      "type": "organization"
+      "type": "web"
     },
     {
       "id": "periodistadigital-assmann",
       "title": "Muere Hugo Assmann",
       "url": "https://www.periodistadigital.com/old/852201.shtml",
       "publisher": "Periodista Digital",
-      "type": "obituary"
+      "type": "news"
     },
     {
       "id": "cja-jesuits-case",
@@ -1906,7 +1906,7 @@
       "title": "Calendário do poder — Frei Betto",
       "url": "https://rocco.com.br/produto/calendario-do-poder/",
       "publisher": "Editora Rocco",
-      "type": "publisher"
+      "type": "book"
     },
     {
       "id": "ihu-camara-integralista",
@@ -1927,7 +1927,7 @@
       "title": "Liberation theology's civil war (Samuel Gregg)",
       "url": "https://www.acton.org/pub/commentary/2008/07/30/liberation-theologys-civil-war",
       "publisher": "Acton Institute",
-      "type": "commentary"
+      "type": "analysis"
     },
     {
       "id": "peoples-dispatch-torres-return",
@@ -1941,7 +1941,7 @@
       "title": "Hugo Assmann (1933-2008) — Antônio Cecchin",
       "url": "https://www.ihuonline.unisinos.br/artigo/1605-antonio-cecchin-1",
       "publisher": "IHU Online — Instituto Humanitas Unisinos",
-      "type": "obituary"
+      "type": "news"
     },
     {
       "id": "mdpi-shaull-alves",
@@ -2004,7 +2004,7 @@
       "title": "Teologia da Libertação e volta ao fundamento",
       "url": "https://revistaeclesiasticabrasileira.itf.edu.br/reb/article/view/1490",
       "publisher": "Revista Eclesiástica Brasileira (67/268, 2007)",
-      "type": "journal"
+      "type": "academic"
     },
     {
       "id": "clacso-aporte",
@@ -2053,7 +2053,7 @@
       "title": "Cardenal Alfonso López Trujillo — Biografía",
       "url": "https://www.aciprensa.com/cardenales/biografias/lopez-trujillo",
       "publisher": "ACI Prensa",
-      "type": "biography"
+      "type": "news"
     },
     {
       "id": "siwo-conferencia-episcopal-chile",
@@ -2074,7 +2074,7 @@
       "title": "Un 25 de julio, pero de 1955, comenzó la historia del Consejo Episcopal Latinoamericano y Caribeño",
       "url": "https://adn.celam.org/un-25-de-julio-pero-de-1955-comenzo-la-historia-del-consejo-episcopal-latinoamericano-y-caribeno/",
       "publisher": "ADN CELAM",
-      "type": "official-site"
+      "type": "news"
     },
     {
       "id": "vatican-lopeztrujillo-funeral",
@@ -2088,7 +2088,7 @@
       "title": "Bishop Pedro Casaldáliga Plá",
       "url": "https://www.catholic-hierarchy.org/bishop/bcaspla.html",
       "publisher": "Catholic-Hierarchy.org",
-      "type": "reference"
+      "type": "database"
     },
     {
       "id": "jp2-letter-brazil-1986",
