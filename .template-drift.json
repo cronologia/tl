@@ -1,0 +1,13 @@
+{
+  "_about": "Template build.js functions this site customises on purpose. Checked by cronologia/core tools/build-drift.py: an undeclared difference is drift; when the template's version of a declared function changes, the declaration goes STALE until the change is ported here and `base` is bumped (python3 tools/build-drift.py --hash <name>).",
+  "customized": {
+    "renderFigureCard": {
+      "reason": "the card links to its name-derived figure page",
+      "base": "9b95d2cecd4a"
+    },
+    "main": {
+      "reason": "writes the per-figure pages, the legacy root redirect stubs and their sitemap routes",
+      "base": "7d2f6fde8121"
+    }
+  }
+}
