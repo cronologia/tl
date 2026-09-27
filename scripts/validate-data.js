@@ -116,7 +116,32 @@ else {
     if (ev.date !== undefined && !isStr(ev.date)) err(`${at}.date must be a string`);
     if (typeof ev.dateVerified !== 'boolean') err(`${at}.dateVerified must be boolean`);
     checkSources(at, ev.sources, true);
+    // Key events (core#3): a short label the ribbon prints above the lanes.
+    if (ev.highlight !== undefined && (!isStr(ev.highlight) || ev.highlight.length > 28)) err(`${at}.highlight must be a short label (1-28 characters)`);
+    // Disputed dates (core#120): attributed claims, each with its own sources.
+    // The event's own year must lie inside the claimed range, so placement is
+    // always one of the claims or between them - never a date nobody claims.
+    if (ev.dateClaims !== undefined) {
+      if (!isArr(ev.dateClaims) || ev.dateClaims.length < 2) err(`${at}.dateClaims must list at least two claims (one date is not a dispute)`);
+      else {
+        ev.dateClaims.forEach((c, j) => {
+          const ct = `${at}.dateClaims[${j}]`;
+          if (!Number.isInteger(c.year) || c.year === 0) err(`${ct}.year must be a non-zero integer (1 BCE is -1)`);
+          if (c.to !== undefined && (!Number.isInteger(c.to) || c.to === 0 || c.to < c.year)) err(`${ct}.to must be a non-zero integer, not before year`);
+          if (!isStr(c.by)) err(`${ct}.by missing: say who dates it this way (attribute, don't assert)`);
+          checkSources(ct, c.sources, true);
+        });
+        const lo = Math.min(...ev.dateClaims.map((c) => c.year));
+        const hi = Math.max(...ev.dateClaims.map((c) => (Number.isInteger(c.to) ? c.to : c.year)));
+        if (isNum(ev.year) && (ev.year < lo || ev.year > hi)) err(`${at}.year ${ev.year} lies outside its dateClaims (${lo}..${hi}); place the event on a claimed date`);
+      }
+    }
   });
+}
+
+if (isArr(d.events)) {
+  const n = d.events.filter((e) => e && e.highlight !== undefined).length;
+  if (n > 6) err(`events: ${n} highlighted; the ribbon names at most 6 key events (core#3)`);
 }
 
 // ---- threads (per-repo lane taxonomy — core#23) -----------------------------
@@ -534,6 +559,40 @@ if (d.disambiguation !== undefined) {
   }
   for (const [id, at] of unknown) {
     err(`${at}: unknown glossary term id "${id}" — not in ${GLOSSARY_TERMS_FILE} (re-run scripts/sync-glossary-terms.js if the glossary added it)`);
+  }
+})();
+
+// ---- reference types: a closed vocabulary (core#74) -------------------------
+// `type` is chrome, not prose: the renderer looks it up in the UI table, so a
+// type outside the table would print a raw English word on a localized page.
+// Every `references` array in the dataset is checked - the top-level one and
+// any a site nests (olavo's philosophers carry their own) - and every
+// offender is named in one run. The set must equal build.js's UI.en.refTypes
+// (a test enforces it). Classify by what the document IS; a stance or a
+// judgement of primacy belongs in the translated publisherNote.
+const REF_TYPES = new Set([
+  'news', 'academic', 'archive', 'official', 'encyclopedia', 'web', 'corpus', 'database',
+  'video', 'index', 'book', 'report', 'legal', 'testimony', 'analysis',
+]);
+(function checkRefTypes() {
+  const bad = [];
+  const walk = (node, at) => {
+    if (Array.isArray(node)) node.forEach((v, i) => walk(v, `${at}[${i}]`));
+    else if (node && typeof node === 'object') {
+      for (const k of Object.keys(node)) {
+        if (k === 'references' && Array.isArray(node[k])) {
+          node[k].forEach((r, i) => {
+            if (r && isStr(r.type) && !REF_TYPES.has(r.type)) bad.push(`${at ? at + '.' : ''}references[${i}] (${r.id || '?'}): "${r.type}"`);
+          });
+        }
+        walk(node[k], at ? `${at}.${k}` : k);
+      }
+    }
+  };
+  walk(d, '');
+  if (bad.length) {
+    err(`${bad.length} reference type(s) outside the closed vocabulary (${[...REF_TYPES].join(', ')}):\n    ` +
+      bad.join('\n    ') + '\n    Retype by what the document is; put any stance in publisherNote (core#74).');
   }
 })();
 

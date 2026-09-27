@@ -289,7 +289,7 @@
       "title": "<survey title — the external estimate>",
       "url": "https://example.org/survey",
       "publisher": "<independent survey organization>",
-      "type": "survey"
+      "type": "report"
     }
   ]
 }

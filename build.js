@@ -70,6 +70,11 @@ const TRANSLATABLE_KEYS = new Set([
   // and `.indirect`) render under the tree as prose. Found untranslated in
   // rcc, fixed there, upstreamed here.
   'direct', 'indirect',
+  // `events[].dateClaims[].by` names who dates the event that way, and why
+  // (core#120). It renders as prose under the event.
+  'by',
+  // `events[].highlight` - a key event's short ribbon label (core#3).
+  'highlight',
   // `organizations[].founded` reads as a date and is written as a sentence
   // ("1817, Ghent (Belgium); in Brazil from the 19th–20th century"). It RENDERS
   // — the card prints "Fundada em <founded>" — so leaving it out put English
@@ -107,6 +112,8 @@ const UI = {
     rvFilterLabel: 'Filter the chronology', rvFirm: 'Firm dates only', rvFind: 'Find',
     rvReading: 'Reading', rvAll: (n) => `all ${n} events`, rvSome: (n, total) => `${n} of ${total} events shown`,
     rvEmpty: 'No events match. Clear the search or turn a storyline back on.',
+    // Disputed dates (core#120): the heading over an event's attributed date claims.
+    rvClaims: 'Competing dates',
     rvRibbonLabel: (n, lanes) => `Overview of all ${n} events${lanes ? ` in ${lanes} storylines` : ''}; long gaps in the record are drawn as breaks`,
     // The numbers chart's own labels (upstreamed from rcc, which localized them).
     ncAxisNote: (max, unit) => `axis: 0–${max} ${unit}`,
@@ -165,6 +172,12 @@ const UI = {
     //     source's stance is not its medium; `publisherNote` again.
     // `testimony` and `analysis` ARE kinds and were missing; the sourcing rules
     // name testimony explicitly as a class with its own corroboration bar.
+    // Citation previews (core#119): the popover's heading ('Reference 3') and its
+    // link back to the full list.
+    citeLabel: 'Reference', citeAll: 'All references',
+    // The archive-copy link in the reference list; was hardcoded English on
+    // every localized page.
+    archivedLabel: 'archived',
     refTypes: {
       news: 'news', academic: 'academic', archive: 'archive', official: 'official',
       encyclopedia: 'encyclopedia', web: 'web', corpus: 'corpus', database: 'database',
@@ -206,6 +219,7 @@ const UI = {
     rvFilterLabel: 'Filtrar la cronología', rvFirm: 'Solo fechas firmes', rvFind: 'Buscar',
     rvReading: 'Leyendo', rvAll: (n) => `los ${n} acontecimientos`, rvSome: (n, total) => `${n} de ${total} acontecimientos mostrados`,
     rvEmpty: 'Ningún acontecimiento coincide. Borre la búsqueda o vuelva a activar un relato.',
+    rvClaims: 'Fechas en disputa',
     rvRibbonLabel: (n, lanes) => `Vista general de los ${n} acontecimientos${lanes ? ` en ${lanes} relatos` : ''}; los grandes vacíos del registro se dibujan como cortes`,
     ncAxisNote: (max, unit) => `eje: 0–${max} ${unit}`,
     ncCaptionMeta: (src, unit) => ` — reportado por ${src}, en ${unit}`,
@@ -250,6 +264,10 @@ const UI = {
     footer: 'Sitio estático compilado a partir de <code>data/chronology.json</code> por <code>build.js</code>. Datos abiertos — correcciones bienvenidas mediante pull request.\n      Parte de la familia de proyectos Cronologia.',
     refsIntro: (n, a) => `${n} fuentes${a ? ` · ${a} con copia en Internet Archive` : ''}. Las fuentes abarcan el\n      espectro de perspectivas de forma deliberada; las afirmaciones controvertidas se atribuyen a sus autores.`,
     orgFounded: 'Fundada en',
+    // Citation previews (core#119): the popover's heading ('Referencia 3') and its
+    // link back to the full list.
+    citeLabel: 'Referencia', citeAll: 'Todas las referencias',
+    archivedLabel: 'archivado',
     refTypes: {
       news: 'prensa', academic: 'académico', archive: 'archivo', official: 'oficial',
       encyclopedia: 'enciclopedia', web: 'web', corpus: 'corpus', database: 'base de datos',
@@ -294,6 +312,7 @@ const UI = {
     rvFilterLabel: 'Filtrar a cronologia', rvFirm: 'Apenas datas firmes', rvFind: 'Buscar',
     rvReading: 'Lendo', rvAll: (n) => `todos os ${n} acontecimentos`, rvSome: (n, total) => `${n} de ${total} acontecimentos exibidos`,
     rvEmpty: 'Nenhum acontecimento corresponde. Limpe a busca ou reative uma narrativa.',
+    rvClaims: 'Datas em disputa',
     rvRibbonLabel: (n, lanes) => `Visão geral dos ${n} acontecimentos${lanes ? ` em ${lanes} narrativas` : ''}; as grandes lacunas do registro aparecem como cortes`,
     ncAxisNote: (max, unit) => `eixo: 0–${max} ${unit}`,
     ncCaptionMeta: (src, unit) => ` — reportado por ${src}, em ${unit}`,
@@ -338,6 +357,10 @@ const UI = {
     footer: 'Site estático compilado a partir de <code>data/chronology.json</code> por <code>build.js</code>. Dados abertos — correções bem-vindas via pull request.\n      Parte da família de projetos Cronologia.',
     refsIntro: (n, a) => `${n} fontes${a ? ` · ${a} com cópia no Internet Archive` : ''}. As fontes abrangem o\n      espectro de perspectivas de forma deliberada; afirmações controversas são atribuídas aos seus autores.`,
     orgFounded: 'Fundada em',
+    // Citation previews (core#119): the popover's heading ('Referência 3') and its
+    // link back to the full list.
+    citeLabel: 'Referência', citeAll: 'Todas as referências',
+    archivedLabel: 'arquivado',
     refTypes: {
       news: 'imprensa', academic: 'acadêmico', archive: 'arquivo', official: 'oficial',
       encyclopedia: 'enciclopédia', web: 'web', corpus: 'corpus', database: 'base de dados',
@@ -2290,12 +2313,24 @@ function layoutRiver(events, threads) {
 }
 
 function renderRiverRibbon(layout, t) {
-  const ROW = 11; const TOP = 2; const nL = layout.lanes.length;
+  // Key events (core#3): an event may carry `highlight: "<short label>"`; the
+  // ribbon names those few above the lanes, so the overview doubles as the
+  // top-of-page summary. No highlights, no label row: byte-identical output.
+  const hl = layout.items.filter((it) => typeof it.ev.highlight === 'string' && it.ev.highlight);
+  const ROW = 11; const TOP = hl.length ? 15 : 2; const nL = layout.lanes.length;
   const H = TOP + nL * ROW + 16;
   const rows = layout.lanes.map((l, k) => `<rect class="rv-row" x="0" y="${TOP + k * ROW}" width="${layout.width}" height="${ROW - 2}"/>`).join('');
   const breaks = layout.columns.filter((c) => c.type === 'break')
     .map((c) => `<rect class="rv-brk" x="${r1f(c.x + c.w / 2 - 2)}" y="${TOP}" width="4" height="${nL * ROW - 2}"><title>${esc(t.spineBreakLabel(c.count, yearLabel(c.from, t), yearLabel(c.to, t)))}</title></rect>`).join('');
   const ticks = layout.items.flatMap((it) => it.lanes.map((k) => `<line class="rv-tick rv-l${k % 8}${it.ev.dateVerified === false ? ' rv-u' : ''}" data-i="${it.i}" x1="${it.x}" x2="${it.x}" y1="${TOP + k * ROW + 1.5}" y2="${TOP + k * ROW + ROW - 3.5}"/>`)).join('');
+  let hlEnd = -Infinity;
+  const hlMarks = hl.map((it) => {
+    const w = it.ev.highlight.length * 5.6;
+    const x = Math.min(Math.max(it.x, w / 2), layout.width - w / 2);
+    const text = x - w / 2 < hlEnd + 6 ? '' : `<text class="rv-hl" x="${r1f(x)}" y="10" text-anchor="middle">${esc(it.ev.highlight)}</text>`;
+    if (text) hlEnd = x + w / 2;
+    return `<line class="rv-hl-tick" data-i="${it.i}" x1="${it.x}" x2="${it.x}" y1="${text ? 12 : 2}" y2="${TOP + nL * ROW - 2}"/>${text}`;
+  }).join('');
   // Axis: the first and last year, and each side of every break.
   const marks = [];
   const first = layout.items[0].ev.year; const last = layout.items[layout.items.length - 1].ev.year;
@@ -2321,9 +2356,35 @@ function renderRiverRibbon(layout, t) {
   const label = t.rvRibbonLabel(layout.items.length, layout.declared ? nL : 0);
   return `        <svg class="rv-ribbon" viewBox="-4 0 ${r1f(layout.width + 8)} ${H}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="${esc(label)}">
           ${rows}${breaks}
-          ${ticks}
+          ${ticks}${hlMarks}
           ${axis}<rect class="rv-win" x="0" y="0" width="0" height="${nL * ROW + TOP}"/>
         </svg>`;
+}
+
+/**
+ * Disputed dates (core#120). An event whose sources disagree on its date may
+ * carry `dateClaims`: two or more `{ year, to?, by, sources }`, each an
+ * attributed claim ("7-5 BC: Maas, from Herod's death"). The event keeps its
+ * own `year` for placement, and the validator holds it inside the claimed
+ * range, so the river never sits on a date nobody claims. Rendered as a small
+ * scale across the claimed years - a tick per year claimed, a bar per range,
+ * the event's own position marked - over the attributed list. Attribution,
+ * not a verdict: the list is in date order, and no claim is marked preferred.
+ */
+function renderDateClaims(ev, refNumById, t) {
+  const cl = Array.isArray(ev.dateClaims) ? ev.dateClaims.slice().sort((a, b) => a.year - b.year) : [];
+  if (cl.length < 2) return '';
+  const end = (c) => (Number.isFinite(c.to) ? c.to : c.year);
+  const lo = Math.min(...cl.map((c) => c.year));
+  const hi = Math.max(...cl.map(end));
+  const pct = (y) => (hi === lo ? 50 : ((y - lo) / (hi - lo)) * 100);
+  const range = (a, b) => (b !== a ? `${yearLabel(a, t)}–${yearLabel(b, t)}` : yearLabel(a, t));
+  const marks = cl.map((c) => (end(c) !== c.year
+    ? `<i class="rv-cr" style="left:${r1f(pct(c.year))}%;width:${r1f(pct(end(c)) - pct(c.year))}%"></i>`
+    : `<i class="rv-ct" style="left:${r1f(pct(c.year))}%"></i>`)).join('');
+  const items = cl.map((c) => `<li><span class="rv-cyr">${esc(range(c.year, end(c)))}</span> ${renderText(c.by)}${renderCites(c.sources, refNumById)}</li>`).join('');
+  return `\n            <div class="rv-claims"><p class="rv-claims-h">${esc(t.rvClaims)} <span>${esc(range(lo, hi))}</span></p>` +
+    `<div class="rv-span" aria-hidden="true">${marks}<b style="left:${r1f(pct(ev.year))}%"></b></div><ul>${items}</ul></div>`;
 }
 
 function renderRiverItem(it, layout, refNumById, t, anchorId) {
@@ -2344,7 +2405,7 @@ function renderRiverItem(it, layout, refNumById, t, anchorId) {
           <div class="rv-year">${esc(yearLabel(ev.year, t))}${ev.date && ev.date !== String(ev.year) ? `<small>${esc(ev.date)}</small>` : ''}${flag}</div>
           <div class="rv-node" aria-hidden="true">${nodes}</div>
           <div class="rv-card">
-            ${kick ? `<p class="rv-kick">${kick}</p>\n            ` : ''}<h3>${esc(ev.title)}</h3>${text}${note}
+            ${kick ? `<p class="rv-kick">${kick}</p>\n            ` : ''}<h3>${esc(ev.title)}</h3>${text}${note}${renderDateClaims(ev, refNumById, t)}
           </div>
         </li>`;
 }
@@ -2389,7 +2450,6 @@ ${rows}
 }
 
 /** Out-of-vocabulary `references[].type` values seen this build (core#74). */
-const UNKNOWN_REF_TYPES = new Set();
 
 function renderEventRow(ev, refNumById, ui) {
   const flag = ev.dateVerified === false
@@ -2451,7 +2511,7 @@ function renderOrgCard(org, refNumById, ui) {
 function renderReference(r, n, archives, ui) {
   const snap = archives[r.url];
   const archived = snap && snap.archiveUrl
-    ? ` · <a class="archive-link" href="${esc(snap.archiveUrl)}" rel="noopener noreferrer" target="_blank">🗄 archived${snap.timestamp ? ` ${esc(formatArchiveTs(snap.timestamp))}` : ''}</a>`
+    ? ` · <a class="archive-link" href="${esc(snap.archiveUrl)}" rel="noopener noreferrer" target="_blank">🗄 ${esc((ui && ui.archivedLabel) || 'archived')}${snap.timestamp ? ` ${esc(formatArchiveTs(snap.timestamp))}` : ''}</a>`
     : '';
   const NOTE_INLINE_MAX = 110;
   const note = r.publisherNote || '';
@@ -2463,16 +2523,11 @@ function renderReference(r, n, archives, ui) {
   // `type` is a CLOSED vocabulary, not prose: it belongs in the UI table with
   // the rest of the chrome, so a new type is a code change that surfaces as a
   // missing label rather than a silent English word on a Portuguese page.
-  // The vocabulary is closed, and an unknown type falls through to the raw
-  // English word on a localized page -- which is exactly what the comment above
-  // says must not happen. Every repo in the family currently has offenders
-  // (core#74), so this REPORTS rather than throws: making it fatal today would
-  // take twelve sites red at once. Once the vocabulary question is settled and
-  // the datasets migrated, this becomes the throw the comment always implied.
-  if (ui && ui.refTypes && r.type && !Object.prototype.hasOwnProperty.call(ui.refTypes, r.type)) {
-    UNKNOWN_REF_TYPES.add(r.type);
-  }
-  const type = (ui && ui.refTypes && ui.refTypes[r.type]) || r.type;
+  // The vocabulary is closed and validate-data.js enforces it (core#74). A
+  // type with no label here is a machinery defect, not a data choice: fail
+  // loudly rather than print the raw English word on a localized page.
+  const type = ui && ui.refTypes ? ui.refTypes[r.type] : r.type;
+  if (!type) throw new Error(`reference "${r.id}": type "${r.type}" has no label in the refTypes table (core#74)`);
   return `        <li id="ref-${n}">
           <a href="${esc(r.url)}" rel="noopener noreferrer" target="_blank">${esc(r.title)}</a>${archived}
           <span class="ref-meta">${esc(pub)} · ${esc(type)}</span>${noteLine}
@@ -2654,7 +2709,7 @@ function renderPage(data, archives, opts = {}) {
   <title>${esc(meta.title)}</title>
   <meta name="description" content="${esc(meta.description)}">
 ${ANALYTICS}
-  <link rel="stylesheet" href="../styles.css">${river ? '\n  <script src="../river.js" defer></script>' : ''}
+  <link rel="stylesheet" href="../styles.css">${river ? '\n  <script src="../river.js" defer></script>' : ''}${references.length ? `\n  <script src="../cite.js" defer data-label="${esc(ui.citeLabel)}" data-all="${esc(ui.citeAll)}"></script>` : ''}
 ${seoHead(meta, base, route, lang)}
 </head>
 <body>
@@ -3034,6 +3089,11 @@ function main() {
   fs.copyFileSync(path.join(SRC_DIR, 'styles.css'), path.join(OUT_DIR, 'styles.css'));
   // The river's filters and reading window; copied only for sites that use it.
   if (data.meta && data.meta.layout === 'river') fs.copyFileSync(path.join(SRC_DIR, 'river.js'), path.join(OUT_DIR, 'river.js'));
+  // The self-hosted text face (core#118), referenced from styles.css.
+  fs.mkdirSync(path.join(OUT_DIR, 'fonts'), { recursive: true });
+  for (const f of fs.readdirSync(path.join(SRC_DIR, 'fonts'))) fs.copyFileSync(path.join(SRC_DIR, 'fonts', f), path.join(OUT_DIR, 'fonts', f));
+  // Citation previews (core#119): shipped whenever there are references to cite.
+  if (Array.isArray(data.references) && data.references.length) fs.copyFileSync(path.join(SRC_DIR, 'cite.js'), path.join(OUT_DIR, 'cite.js'));
   // Catalogue images: only the files the data references, so docs/ carries
   // nothing the site does not show.
   const catImages = ((data.catalogue && data.catalogue.items) || [])
@@ -3051,18 +3111,6 @@ function main() {
     `${data.events.length} events, ${data.figures.length} figures, ` +
     `${data.references.length} references, ${archivedRefs} with archive fallback.`
   );
-  // Named, not counted, and ALL of them: a report that says "3 problems" sends
-  // you looking, and one that says which three is actionable in the same run.
-  // See core#74 -- the publisher check's one-at-a-time reporting is the
-  // anti-pattern this avoids.
-  if (UNKNOWN_REF_TYPES.size) {
-    console.warn(
-      `WARNING: ${UNKNOWN_REF_TYPES.size} reference type(s) are outside the closed refTypes ` +
-      `vocabulary and render as raw English on every localized page: ` +
-      `${[...UNKNOWN_REF_TYPES].sort().map((t) => JSON.stringify(t)).join(', ')}. ` +
-      `Retype them, or move the characterisation into publisherNote, which IS translated (core#74).`
-    );
-  }
 }
 
 // Run the build only when invoked directly; when required (tests) just expose
@@ -3080,12 +3128,12 @@ module.exports = {
   layoutSwimlanes, renderSwimlanes,
   PLACE_COMPOUND_SEP, placeIndex, resolvePlaceString, layoutPlacesMap, renderPlacesMap,
   layoutCatalogue, renderCatalogue, osmLink, CATALOGUE_LICENSES,
-  layoutRiver, renderRiver, RIVER_LAYOUTS,
+  layoutRiver, renderRiver, RIVER_LAYOUTS, renderDateClaims, renderRiverRibbon,
   FIG_UI, figureSlug, buildFigureMatchers, mentions, relatedEventIdx, relatedEvents, renderFigurePage, figureRedirectStub,
   loadPlaces, loadWorld,
   renderPage,
   LOCALES, ROUTES, OG_LOCALE, UI, loadDict, loadDictMeta, disclaimerFor, renderApprovalLadder, ladderRungs, STATUS_GLYPH,
-  renderEventRow, UNKNOWN_REF_TYPES, renderReference, siteBase, translator, localizeData,
+  renderEventRow, renderReference, siteBase, translator, localizeData,
   TRANSLATABLE_KEYS, SUBTREE_TRANSLATABLE, keysFor, collectTranslatable,
   alternates, seoHead, langSwitcher, renderRootStub, renderSitemap, renderRobots,
 };
