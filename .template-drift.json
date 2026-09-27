@@ -7,7 +7,13 @@
     },
     "main": {
       "reason": "writes the per-figure pages, the legacy root redirect stubs and their sitemap routes",
-      "base": "7d2f6fde8121"
+      "base": "5a146fdd98fb"
+    }
+  },
+  "tests": {
+    "data-invariants.test.js": {
+      "reason": "tl's sitemap also lists the per-figure pages, and its events all fall after 1500, so the year bound is tighter than the template's BCE-aware one",
+      "base": "274d14a6a81b"
     }
   }
 }
