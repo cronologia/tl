@@ -1,6 +1,6 @@
 {
   "generatedBy": "scripts/archive-refs.js",
-  "updatedAt": "2026-09-21",
+  "updatedAt": "2026-09-27",
   "snapshots": {
     "https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/": {
       "archiveUrl": "https://web.archive.org/web/20260515070220/https://adn.celam.org/aun-ano-de-la-primera-asamblea-eclesial-de-america-latina-y-el-caribe/",
@@ -8,6 +8,12 @@
       "status": "200",
       "fresh": false,
       "checkedAt": "2026-07-20T11:57:18.579Z"
+    },
+    "https://adn.celam.org/un-25-de-julio-pero-de-1955-comenzo-la-historia-del-consejo-episcopal-latinoamericano-y-caribeno/": {
+      "refId": "celam-founding-adn",
+      "archiveUrl": "https://web.archive.org/web/20260927175744/https://adn.celam.org/en/blog/celam-10/un-25-de-julio-pero-de-1955-comenzo-la-historia-del-consejo-episcopal-latinoamericano-y-caribeno-7051",
+      "timestamp": "20260927175744",
+      "checkedAt": "2026-09-27"
     },
     "https://biblioteca.clacso.edu.ar/Costa_Rica/dei/20120710104601/aporte.pdf": {
       "archiveUrl": "https://web.archive.org/web/20260131210509/https://biblioteca.clacso.edu.ar/Costa_Rica/dei/20120710104601/aporte.pdf",
@@ -82,6 +88,13 @@
       "archiveUrl": "https://web.archive.org/web/20260803100811/https://digitalarchives.episcopalarchives.org/cgi-bin/ENS/ENSpress_release.pl?pr_number=92179E",
       "timestamp": "20260803100811",
       "checkedAt": "2026-08-10"
+    },
+    "https://discovery.ucl.ac.uk/1570994/1/Selejan_War%20in%20Paradise_Jan%202015_FINAL%20copy.pdf": {
+      "refId": "selejan-solentiname",
+      "archiveUrl": "https://web.archive.org/web/20251206152657/https://discovery.ucl.ac.uk/id/eprint/1570994/1/Selejan_War%20in%20Paradise_Jan%202015_FINAL%20copy.pdf",
+      "timestamp": "20251206152657",
+      "via": "https://discovery.ucl.ac.uk/id/eprint/1570994/1/Selejan_War%20in%20Paradise_Jan%202015_FINAL%20copy.pdf",
+      "checkedAt": "2026-09-27"
     },
     "https://en.wikipedia.org/wiki/%C3%93scar_Romero": {
       "archiveUrl": "https://web.archive.org/web/20260629164214/https://en.wikipedia.org/wiki/%C3%93scar_Romero",
